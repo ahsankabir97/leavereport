@@ -19,7 +19,7 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 </script>
-
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
   --color-background-primary:#f0faf6;
@@ -474,14 +474,19 @@ textarea{min-height:88px;resize:vertical;}
       </div>
       
       <div class="card" id="dash-eng-card">
-        <div class="ch"><i class="ti ti-user-check"></i>Engineers — Leave Status</div>
+        <div class="ch">
+          <i class="ti ti-user-check"></i>Engineers — Leave Status
+          <button class="bs" style="margin-left:auto;padding:6px 14px;font-size:11px;" onclick="exportAllExcel('Engineer')"><i class="ti ti-file-spreadsheet"></i> Export All</button>
+        </div>
         <div id="dash-eng-table"><div class="empty">No engineers registered yet.</div></div>
       </div>
       <div class="card" id="dash-tech-card">
-        <div class="ch"><i class="ti ti-tool"></i>Technicians — Leave Status</div>
+        <div class="ch">
+          <i class="ti ti-tool"></i>Technicians — Leave Status
+          <button class="bs" style="margin-left:auto;padding:6px 14px;font-size:11px;" onclick="exportAllExcel('Technician')"><i class="ti ti-file-spreadsheet"></i> Export All</button>
+        </div>
         <div id="dash-tech-table"><div class="empty">No technicians registered yet.</div></div>
       </div>
-    </div>
 
   </main>
 </div>
@@ -1041,6 +1046,7 @@ function buildPersonTable(people) {
         </div>
       </td>
       <td><span class="bal-chip ${balCls}">${totalRem} days</span></td>
+      <td><button class="editbtn" title="Download Excel" onclick="downloadPersonExcel('${s.fn.replace(/'/g,"\\'")}')"><i class="ti ti-download"></i></button></td>
     </tr>`;
   }).join('');
   return `<div class="data-table-wrap"><table class="data-table">
@@ -1051,11 +1057,11 @@ function buildPersonTable(people) {
       <th style="text-align:center;">Total Taken</th>
       <th>Usage</th>
       <th>Remaining</th>
+      <th>Download</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table></div>`;
 }
-
 
 function renderDash() {
   if (!dataLoaded.staff || !dataLoaded.leaves) return;
@@ -1084,5 +1090,68 @@ function viewStaffLeave(role, name) {
   // নির্দিষ্ট staff select করে তার data দেখানো
   document.getElementById('lr-name').value = name;
   renderLeave();
+}
+// ── Excel Export ──
+function personSummaryRow(s) {
+  const personLeaves = leaves.filter(l => l.name === s.fn);
+  const sick = personLeaves.filter(l => l.type === 'Sick Leave').reduce((a, l) => a + l.days, 0);
+  const casual = personLeaves.filter(l => l.type === 'Casual Leave').reduce((a, l) => a + l.days, 0);
+  return {
+    'Name': s.fn,
+    'ID': s.id || '',
+    'Phone': s.ph || '',
+    'Role': s.role,
+    'Sick Leave Taken': sick,
+    'Sick Leave Remaining': Math.max(0, QUOTA['Sick Leave'] - sick),
+    'Casual Leave Taken': casual,
+    'Casual Leave Remaining': Math.max(0, QUOTA['Casual Leave'] - casual),
+    'Total Leave Taken': sick + casual
+  };
+}
+
+function exportAllExcel(role) {
+  const people = staff.filter(s => s.role === role);
+  if (!people.length) { alert('No ' + role + ' records to export.'); return; }
+  const summaryData = people.map(personSummaryRow);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryData), 'Summary');
+
+  // All leave detail rows for this role
+  const detailRows = leaves
+    .filter(l => l.role === role)
+    .map(l => ({
+      'Name': l.name, 'Type': l.type, 'From': l.from, 'To': l.to,
+      'Days': l.days, 'Reason': l.reason || ''
+    }));
+  if (detailRows.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(detailRows), 'Leave Details');
+
+  const hourRows = hourLogs
+    .filter(h => h.role === role)
+    .map(h => ({
+      'Name': h.name, 'Type': h.type, 'Date': h.date,
+      'Hours': h.hours, 'Reason': h.reason || ''
+    }));
+  if (hourRows.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(hourRows), 'Early Leave-Delay Entry');
+
+  XLSX.writeFile(wb, role + '_Leave_Report_' + new Date().toISOString().slice(0,10) + '.xlsx');
+}
+
+function downloadPersonExcel(name) {
+  const s = staff.find(x => x.fn === name);
+  if (!s) { alert('Staff not found.'); return; }
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([personSummaryRow(s)]), 'Summary');
+
+  const personLeaves = leaves.filter(l => l.name === name).map(l => ({
+    'Type': l.type, 'From': l.from, 'To': l.to, 'Days': l.days, 'Reason': l.reason || ''
+  }));
+  if (personLeaves.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(personLeaves), 'Leave History');
+
+  const personHours = hourLogs.filter(h => h.name === name).map(h => ({
+    'Type': h.type, 'Date': h.date, 'Hours': h.hours, 'Reason': h.reason || ''
+  }));
+  if (personHours.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(personHours), 'Early-Delay Records');
+
+  XLSX.writeFile(wb, name.replace(/\s+/g,'_') + '_Leave_Report.xlsx');
 }
 </script>
