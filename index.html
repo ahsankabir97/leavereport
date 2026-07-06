@@ -120,6 +120,8 @@ textarea{min-height:88px;resize:vertical;}
 .av-e{background:#d1fae5;color:#064e3b;}.av-t{background:#ccfbf1;color:#0f766e;}
 .nm{font-weight:700;color:var(--color-text-primary);font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;}
 .nsub{font-size:11px;color:#6b7280;font-weight:400;margin-top:1px;}
+.nm-link{cursor:pointer;transition:color .15s;}
+.nm-link:hover{color:var(--color-accent);text-decoration:underline;}
 .delbtn{background:#ffe4e6;border:none;cursor:pointer;color:#be123c;font-size:13px;padding:5px 7px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;transition:background .15s,transform .1s;}
 .delbtn:hover{background:#fecdd3;transform:scale(1.1);}
 .editbtn{background:#d1fae5;border:none;cursor:pointer;color:#065f46;font-size:13px;padding:5px 7px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;margin-right:4px;transition:background .15s,transform .1s;}
@@ -476,7 +478,6 @@ textarea{min-height:88px;resize:vertical;}
   <div class="stat"><div class="sl">Engineers</div><div class="sv" id="de">0</div></div>
   <div class="stat"><div class="sl">Technicians</div><div class="sv" id="dt">0</div></div>
   <div class="stat"><div class="sl">Total Staff</div><div class="sv" id="dtt">0</div></div>
-  <div class="stat"><div class="sl">Total Leaves</div><div class="sv" id="dl">0</div></div>
 </div>
       </div>
       <div class="card" id="dash-eng-card">
@@ -714,7 +715,7 @@ function renderStaff() {
           const ini = (s.fn[0] || '').toUpperCase();
           return `<tr>
             <td>
-  <div class="nm">${s.fn}</div>
+  <div class="nm nm-link" data-role="${s.role}" data-name="${s.fn.replace(/"/g,'&quot;')}" title="Leave records দেখতে ক্লিক করুন">${s.fn}</div>
 </td>
             <td style="font-size:12px;font-weight:600;color:var(--color-text-secondary);">${s.id || '—'}</td>
             <td style="font-size:12px;font-weight:600;color:var(--color-text-secondary);">${s.ph || '—'}</td>
@@ -730,6 +731,12 @@ function renderStaff() {
       </tbody>
     </table>
     </div>`;
+document.addEventListener('click', function(e) {
+  const el = e.target.closest('.nm-link');
+  if (el) {
+    viewStaffLeave(el.dataset.role, el.dataset.name);
+  }
+});
 }
 
 function delStaff(i) {
@@ -1030,7 +1037,7 @@ function buildPersonTable(people) {
     const barCls = pct >= 100 ? 'danger' : pct >= 70 ? 'warn' : '';
     const balCls = totalRem === 0 ? 'bal-zero' : totalRem <= 5 ? 'bal-low' : 'bal-ok';
     return `<tr>
-      <td><div style="display:inline-block;text-align:center;"><div class="nm">${s.fn}</div><div class="nsub">${s.id || 'No ID'}</div></div></td>
+      <td><div style="display:inline-block;text-align:center;"><div class="nm nm-link" data-role="${s.role}" data-name="${s.fn.replace(/"/g,'&quot;')}" title="Leave records দেখতে ক্লিক করুন">${s.fn}</div><div class="nsub">${s.id || 'No ID'}</div></div></td>
       <td style="text-align:center;font-weight:700;color:var(--color-text-primary);">${sick}<span style="font-size:10px;color:var(--color-text-secondary);font-weight:600;"> /10</span></td>
       <td style="text-align:center;font-weight:700;color:var(--color-text-primary);">${casual}<span style="font-size:10px;color:var(--color-text-secondary);font-weight:600;"> /14</span></td>
       <td style="text-align:center;font-weight:700;font-size:15px;color:#c0392b;">${taken}</td>
@@ -1064,8 +1071,28 @@ function renderDash() {
   document.getElementById('de').textContent = eng.length;
   document.getElementById('dt').textContent = tech.length;
   document.getElementById('dtt').textContent = staff.length;
-  document.getElementById('dl').textContent = leaves.length;
   document.getElementById('dash-eng-table').innerHTML = buildPersonTable(eng);
   document.getElementById('dash-tech-table').innerHTML = buildPersonTable(tech);
+}
+function viewStaffLeave(role, name) {
+  // Sidebar navigation active state ঠিক করা
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    const oc = b.getAttribute('onclick') || '';
+    if (oc.includes("go('leave-rec'")) b.classList.add('active');
+  });
+
+  // পেজ সুইচ করা
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('p-leave-rec').classList.add('active');
+  closeSidebar();
+
+  // role select করে name dropdown populate করা
+  document.getElementById('lr-role').value = role;
+  updLeaveRecRole();
+
+  // নির্দিষ্ট staff select করে তার data দেখানো
+  document.getElementById('lr-name').value = name;
+  renderLeave();
 }
 </script>
