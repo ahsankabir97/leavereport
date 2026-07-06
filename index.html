@@ -472,14 +472,7 @@ textarea{min-height:88px;resize:vertical;}
         <div class="hero-text"><h1>Employee Leave Management System</h1><p>Dashboard — Leave summary per employee</p></div>
         <div class="hero-date"><div class="hd-day"></div><div class="hd-full"></div></div>
       </div>
-      <div class="card card-sm">
-  <div class="ch"><i class="ti ti-users"></i>Staff Overview</div>
-  <div class="stats stats-sm">
-  <div class="stat"><div class="sl">Engineers</div><div class="sv" id="de">0</div></div>
-  <div class="stat"><div class="sl">Technicians</div><div class="sv" id="dt">0</div></div>
-  <div class="stat"><div class="sl">Total Staff</div><div class="sv" id="dtt">0</div></div>
-</div>
-      </div>
+      
       <div class="card" id="dash-eng-card">
         <div class="ch"><i class="ti ti-user-check"></i>Engineers — Leave Status</div>
         <div id="dash-eng-table"><div class="empty">No engineers registered yet.</div></div>
@@ -1068,9 +1061,6 @@ function renderDash() {
   if (!dataLoaded.staff || !dataLoaded.leaves) return;
   const eng = staff.filter(s => s.role === 'Engineer');
   const tech = staff.filter(s => s.role === 'Technician');
-  document.getElementById('de').textContent = eng.length;
-  document.getElementById('dt').textContent = tech.length;
-  document.getElementById('dtt').textContent = staff.length;
   document.getElementById('dash-eng-table').innerHTML = buildPersonTable(eng);
   document.getElementById('dash-tech-table').innerHTML = buildPersonTable(tech);
 }
