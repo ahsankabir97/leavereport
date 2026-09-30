@@ -481,7 +481,7 @@ td select{height:var(--rh,30px);padding:0 4px;min-width:0;font-size:13px}
     &lt;button id=&quot;next&quot;&gt;›&lt;/button&gt;
     &lt;button id=&quot;add&quot;&gt;+ Add Holiday&lt;/button&gt;
     &lt;button id=&quot;addn&quot;&gt;+ Add Name&lt;/button&gt;
-    &lt;button id=&quot;gen&quot; class=&quot;p&quot;&gt;Generate Report&lt;/button&gt;
+    &lt;button id=&quot;gen&quot; class=&quot;p&quot;&gt;Update Schedule&lt;/button&gt;&lt;span class=&quot;ok&quot; id=&quot;ok&quot;&gt;&lt;/span&gt;
     &lt;span id=&quot;cloud&quot; style=&quot;font-size:12px;font-weight:600&quot;&gt;&lt;/span&gt;
   &lt;/div&gt;
   &lt;div class=&quot;sum&quot; id=&quot;sum&quot;&gt;&lt;/div&gt;
@@ -490,16 +490,6 @@ td select{height:var(--rh,30px);padding:0 4px;min-width:0;font-size:13px}
     &lt;tbody id=&quot;body&quot;&gt;&lt;/tbody&gt;
   &lt;/table&gt;&lt;/div&gt;
 
-  &lt;div id=&quot;rep&quot;&gt;
-    &lt;h2&gt;Report&lt;/h2&gt;
-    &lt;div class=&quot;bar&quot;&gt;
-      &lt;button id=&quot;cnames&quot; class=&quot;p&quot;&gt;Copy Names Only&lt;/button&gt;
-      &lt;button id=&quot;csv&quot;&gt;Download CSV&lt;/button&gt;
-      &lt;span class=&quot;ok&quot; id=&quot;ok&quot;&gt;&lt;/span&gt;
-    &lt;/div&gt;
-    &lt;div class=&quot;sc&quot;&gt;&lt;table class=&quot;xl&quot; id=&quot;rt&quot;&gt;&lt;/table&gt;&lt;/div&gt;
-    &lt;textarea id=&quot;ta&quot; readonly style=&quot;position:fixed;left:-9999px;top:0;height:1px;width:1px&quot;&gt;&lt;/textarea&gt;
-  &lt;/div&gt;
 
 &lt;/div&gt;
 &lt;script&gt;
@@ -551,7 +541,6 @@ function render(){
   $(&quot;body&quot;).innerHTML=html||&#x27;&lt;tr&gt;&lt;td colspan=&quot;6&quot; class=&quot;e&quot;&gt;No holidays this month&lt;/td&gt;&lt;/tr&gt;&#x27;;
   $(&quot;sum&quot;).innerHTML=all.map((x,i)=&gt;`&lt;div style=&quot;--h:${hue(x)}&quot;&gt;${x}&lt;b&gt;${cnt[x]} day${cnt[x]===1?&quot;&quot;:&quot;s&quot;}&lt;/b&gt;&lt;/div&gt;`).join(&quot;&quot;);
   fit();
-  if($(&quot;rep&quot;).style.display===&quot;block&quot;) report();
 }
 
 function fit(){
@@ -566,19 +555,6 @@ window.addEventListener(&quot;resize&quot;,fit);
 const fmt=r=&gt;`${r.d} ${MON[r.mo-1].slice(0,3)} ${r.y}`;
 const namesTSV=()=&gt;rows().map(r=&gt;r.a.join(&quot;\t&quot;)).join(&quot;\n&quot;);
 const fullTSV=()=&gt;[&quot;Date\tDay\tHoliday\tEngineer 1\tEngineer 2\tEngineer 3&quot;].concat(rows().map(r=&gt;[fmt(r),DAYS[r.w],r.h||&quot;Weekend&quot;,...r.a].join(&quot;\t&quot;))).join(&quot;\n&quot;);
-function report(){
-  $(&quot;rep&quot;).style.display=&quot;block&quot;;
-  const rs=rows(),L=&quot;ABCDEF&quot;;
-  let h=&quot;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&quot;+[...L].map(c=&gt;&quot;&lt;th&gt;&quot;+c+&quot;&lt;/th&gt;&quot;).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;;
-  h+=&#x27;&lt;tr class=&quot;hd&quot;&gt;&lt;td class=&quot;rn&quot;&gt;1&lt;/td&gt;&#x27;+[&quot;Date&quot;,&quot;Day&quot;,&quot;Holiday&quot;,&quot;Engineer 1&quot;,&quot;Engineer 2&quot;,&quot;Engineer 3&quot;].map(x=&gt;&quot;&lt;td&gt;&quot;+x+&quot;&lt;/td&gt;&quot;).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;;
-  rs.forEach((r,i)=&gt;{h+=&#x27;&lt;tr&gt;&lt;td class=&quot;rn&quot;&gt;&#x27;+(i+2)+&quot;&lt;/td&gt;&quot;+[fmt(r),DAYS[r.w],r.h||&quot;Weekend&quot;,...r.a].map((x,j)=&gt;&quot;&lt;td&quot;+(j&gt;2?(&#x27; class=&quot;en&quot;&#x27;+(x?&#x27; style=&quot;--h:&#x27;+hue(x)+&#x27;&quot;&#x27;:&quot;&quot;)):&quot;&quot;)+&quot;&gt;&quot;+x+&quot;&lt;/td&gt;&quot;).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;});
-  $(&quot;rt&quot;).innerHTML=h;
-}
-function copy(text){
-  const done=()=&gt;{$(&quot;ok&quot;).textContent=&quot;Copied ✓&quot;;setTimeout(()=&gt;$(&quot;ok&quot;).textContent=&quot;&quot;,2000)};
-  const fb=()=&gt;{$(&quot;ta&quot;).value=text;$(&quot;ta&quot;).select();try{document.execCommand(&quot;copy&quot;);done()}catch(e){$(&quot;ok&quot;).textContent=&quot;Press Ctrl+C to copy&quot;}};
-  if(navigator.clipboard&amp;&amp;window.isSecureContext){navigator.clipboard.writeText(text).then(done,fb)}else fb();
-}
 function syncToSchedule(){
   const a={};rows().forEach(r=&gt;{if(r.a.some(x=&gt;x))a[r.iso]=r.a.slice()});
   const n=Object.keys(a).length;
@@ -589,19 +565,24 @@ function syncToSchedule(){
     return &quot;Duty Schedule updated ✓ (&quot;+n+&quot; day&quot;+(n===1?&quot;&quot;:&quot;s&quot;)+&quot;)&quot;;
   }catch(e){return &quot;Could not update Duty Schedule&quot;}
 }
-$(&quot;gen&quot;).onclick=()=&gt;{report();const m=syncToSchedule();
-  if(m){$(&quot;ok&quot;).textContent=m;setTimeout(()=&gt;{if($(&quot;ok&quot;).textContent===m)$(&quot;ok&quot;).textContent=&quot;&quot;},4000)}
-  $(&quot;rep&quot;).scrollIntoView({behavior:&quot;smooth&quot;})};
-$(&quot;cnames&quot;).onclick=()=&gt;copy(namesTSV());
-$(&quot;csv&quot;).onclick=()=&gt;{
-  const q=v=&gt;&#x27;&quot;&#x27;+String(v).replace(/&quot;/g,&#x27;&quot;&quot;&#x27;)+&#x27;&quot;&#x27;;
-  const lines=[[&quot;Date&quot;,&quot;Day&quot;,&quot;Holiday&quot;,&quot;Engineer 1&quot;,&quot;Engineer 2&quot;,&quot;Engineer 3&quot;]].concat(rows().map(r=&gt;[fmt(r),DAYS[r.w],r.h||&quot;Weekend&quot;,...r.a]));
-  const blob=new Blob([&quot;\ufeff&quot;+lines.map(l=&gt;l.map(q).join(&quot;,&quot;)).join(&quot;\n&quot;)],{type:&quot;text/csv&quot;});
-  const a=document.createElement(&quot;a&quot;);a.href=URL.createObjectURL(blob);a.download=&quot;offday-duty-&quot;+$(&quot;m&quot;).value+&quot;.csv&quot;;document.body.appendChild(a);a.click();a.remove();
-};
+$(&quot;gen&quot;).onclick=()=&gt;{const m=syncToSchedule();
+  if(m){$(&quot;ok&quot;).textContent=m;setTimeout(()=&gt;{if($(&quot;ok&quot;).textContent===m)$(&quot;ok&quot;).textContent=&quot;&quot;},4000)}};
 $(&quot;body&quot;).onchange=e=&gt;{const t=e.target,d=t.dataset.d;if(!d)return;
   const a=(store.assign[d]||[&quot;&quot;,&quot;&quot;,&quot;&quot;]).slice();a[+t.dataset.i]=t.value;
   if(a.every(x=&gt;!x))delete store.assign[d];else store.assign[d]=a;save();render()};
+$(&quot;body&quot;).addEventListener(&quot;keydown&quot;,e=&gt;{
+  const t=e.target;
+  if(t.tagName!==&quot;SELECT&quot;||!t.dataset.d)return;
+  if(e.key===&quot;Backspace&quot;||e.key===&quot;Delete&quot;){
+    e.preventDefault();
+    if(!t.value)return;
+    const d=t.dataset.d,i=t.dataset.i;
+    t.value=&quot;&quot;;
+    t.dispatchEvent(new Event(&quot;change&quot;,{bubbles:true}));
+    const n=document.querySelector(&#x27;select[data-d=&quot;&#x27;+d+&#x27;&quot;][data-i=&quot;&#x27;+i+&#x27;&quot;]&#x27;);
+    if(n)n.focus();
+  }
+});
 $(&quot;body&quot;).onclick=e=&gt;{const r=e.target.dataset.rm;if(r){delete store.custom[r];save();render()}};
 $(&quot;m&quot;).onchange=render;
 const shift=k=&gt;{const [y,m]=$(&quot;m&quot;).value.split(&quot;-&quot;).map(Number);const dt=new Date(y,m-1+k,1);$(&quot;m&quot;).value=dt.getFullYear()+&quot;-&quot;+pad(dt.getMonth()+1);render()};
@@ -800,6 +781,15 @@ document.addEventListener(&quot;change&quot;,e=&gt;{const t=e.target;if(!t.datas
  if(dup){const g=C[+dup.dataset.c];alert(&quot;Warning: &quot;+t.value.trim().toUpperCase()+&quot; is already assigned in this row (&quot;+g.g+&quot; - column &quot;+(g.i+1)+&quot;).\nThe same name cannot be added twice on the same date.&quot;);
   t.value=t.dataset.pv||&quot;&quot;;return}
  t.dataset.pv=t.value},true);
+// Backspace / Delete in a duty cell clears the whole name
+document.addEventListener(&quot;keydown&quot;,e=&gt;{const t=e.target;
+ if(!t.dataset||!t.dataset.k||(e.key!==&quot;Backspace&quot;&amp;&amp;e.key!==&quot;Delete&quot;))return;
+ e.preventDefault();
+ if(!t.value)return;
+ t.value=&quot;&quot;;
+ t.dispatchEvent(new Event(&quot;input&quot;,{bubbles:true}));
+ t.dispatchEvent(new Event(&quot;change&quot;,{bubbles:true}));
+});
 $(&quot;menu&quot;).onclick=()=&gt;{parent.postMessage({t:&quot;sched-menu&quot;},&quot;*&quot;)};
 const now=new Date();const dm=new Date(now.getFullYear(),now.getMonth()+(now.getDate()&gt;20?1:0),1);$(&quot;m&quot;).value=dm.getFullYear()+&quot;-&quot;+pad(dm.getMonth()+1);
 const HM={ARIF:235,AHSAN:155,MARUF:50,SAYED:190,TAMIM:330,AMIT:275,BASUDEB:85},XH=[15,305,215,120,355,70,170,255];
