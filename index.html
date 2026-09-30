@@ -682,6 +682,7 @@ button:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,0,0,.14)}
 #clr{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
 #cp{background:#2563eb;border-color:#2563eb;color:#fff}
 #csv{background:#ea580c;border-color:#ea580c;color:#fff}
+#xl{background:#16a34a;border-color:#16a34a;color:#fff}
 .ok{color:#0d9b60;font-weight:600}
 .sc{overflow:auto;max-height:calc(100vh - 46px);border:1px solid #cfd3cc;border-radius:8px;background:#fff}
 table{border-collapse:separate;border-spacing:0;font-size:11px;text-align:center}
@@ -734,11 +735,11 @@ tr.we td.f,tr.gh td.f{background:hsl(var(--h) 60% 40%);outline:1.5px solid #000;
 tr.we td.tt,tr.gh td.tt{background:#6552c9;outline:1.5px solid #000;outline-offset:-1.5px}
 tr.we td.o,tr.gh td.o{outline:1.5px solid #000;outline-offset:-1.5px}
 tr.we td.f input,tr.we td.tt input,tr.we td.o input,tr.gh td.f input,tr.gh td.tt input,tr.gh td.o input{color:#fff;font-weight:800;text-shadow:0 0 2px rgba(0,0,0,.45)}
-&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;w&quot;&gt;
+&lt;/style&gt;&lt;script src=&quot;https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js&quot;&gt;&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;w&quot;&gt;
 &lt;div class=&quot;bar&quot;&gt;&lt;button id=&quot;menu&quot; title=&quot;Show / hide navigation&quot;&gt;☰ Menu&lt;/button&gt;&lt;h1&gt;Duty Schedule&lt;/h1&gt;
 &lt;button id=&quot;prev&quot;&gt;‹&lt;/button&gt;&lt;input type=&quot;month&quot; id=&quot;m&quot;&gt;&lt;button id=&quot;next&quot;&gt;›&lt;/button&gt;
 &lt;button id=&quot;fill&quot;&gt;Fill Defaults&lt;/button&gt;&lt;button id=&quot;an&quot;&gt;+ Add Name&lt;/button&gt;&lt;button id=&quot;rn&quot;&gt;− Remove Name&lt;/button&gt;&lt;button id=&quot;clr&quot;&gt;Clear Month&lt;/button&gt;
-&lt;button id=&quot;cp&quot;&gt;Copy for Excel&lt;/button&gt;&lt;button id=&quot;csv&quot;&gt;Download CSV&lt;/button&gt;&lt;span class=&quot;ok&quot; id=&quot;ok&quot;&gt;&lt;/span&gt;&lt;span id=&quot;cloud&quot; style=&quot;font-size:12px;font-weight:600&quot;&gt;&lt;/span&gt;
+&lt;button id=&quot;cp&quot;&gt;Copy for Excel&lt;/button&gt;&lt;button id=&quot;xl&quot;&gt;Download Excel (.xlsx)&lt;/button&gt;&lt;span class=&quot;ok&quot; id=&quot;ok&quot;&gt;&lt;/span&gt;&lt;span id=&quot;cloud&quot; style=&quot;font-size:12px;font-weight:600&quot;&gt;&lt;/span&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sc&quot;&gt;&lt;table id=&quot;t&quot;&gt;&lt;/table&gt;&lt;/div&gt;
 &lt;div class=&quot;two&quot;&gt;&lt;div&gt;&lt;h2&gt;Technician Teams&lt;/h2&gt;&lt;div class=&quot;tb&quot;&gt;&lt;table id=&quot;tt&quot;&gt;&lt;/table&gt;&lt;/div&gt;
@@ -875,14 +876,49 @@ $(&quot;fill&quot;).onclick=()=&gt;{if(!confirm(&quot;Fill this month with defau
 $(&quot;an&quot;).onclick=()=&gt;{const n=(prompt(&quot;New engineer name&quot;)||&quot;&quot;).trim().toUpperCase();if(!n)return;if(!S.list.includes(n)){S.list.push(n);save();setDL()}$(&quot;ok&quot;).textContent=n+&quot; added ✓&quot;;setTimeout(()=&gt;$(&quot;ok&quot;).textContent=&quot;&quot;,2500)};
 $(&quot;rn&quot;).onclick=()=&gt;{const n=(prompt(&quot;Name to remove from the suggestion list:\n&quot;+S.list.join(&quot;, &quot;))||&quot;&quot;).trim().toUpperCase();if(!n||!S.list.includes(n))return;S.list=S.list.filter(x=&gt;x!==n);save();setDL()};
 $(&quot;clr&quot;).onclick=()=&gt;{if(!confirm(&quot;Clear all entries of this month?&quot;))return;days().forEach(d=&gt;{delete S.days[d.iso];if(S.mv)delete S.mv[d.iso]});save();render()};
-const rowsT=()=&gt;[[&quot;Date&quot;].concat(CO.map(ci=&gt;C[ci].first?C[ci].g:&quot;&quot;))].concat(days().map(d=&gt;[d.lbl].concat(CO.map(ci=&gt;(S.days[d.iso]||[])[ci]||&quot;&quot;))));
+const rowsD=()=&gt;[[&quot;Date&quot;].concat(CO.map(ci=&gt;C[ci].first?C[ci].g:&quot;&quot;))].concat(days().map(d=&gt;[d.lbl].concat(CO.map(ci=&gt;(S.days[d.iso]||[])[ci]||&quot;&quot;))));
+const rowsT=()=&gt;{const R=rowsD();
+ R.push([&quot;&quot;],[&quot;Technician Teams&quot;],[&quot;Team&quot;,&quot;Technician&quot;,&quot;Technician&quot;,&quot;Helper&quot;]);
+ S.teams.tt.forEach(r=&gt;R.push(r.slice()));
+ R.push([&quot;&quot;],[&quot;Night Teams&quot;],[&quot;Team&quot;,&quot;Technician&quot;,&quot;Technician&quot;,&quot;Technician&quot;]);
+ S.teams.nt.forEach(r=&gt;R.push(r.slice()));
+ const N=[];const walk=n=&gt;{n.childNodes.forEach(c=&gt;{if(c.nodeType===3){const t=c.textContent.trim();if(t)N.push([t])}
+  else if(c.tagName===&quot;TABLE&quot;){c.querySelectorAll(&quot;tr&quot;).forEach(tr=&gt;N.push([...tr.children].map(x=&gt;x.textContent.trim())))}
+  else if(c.tagName===&quot;BR&quot;){}
+  else if(c.querySelector&amp;&amp;c.querySelector(&quot;table&quot;)){walk(c)}
+  else{(c.innerText||c.textContent||&quot;&quot;).split(&quot;\n&quot;).forEach(l=&gt;{if(l.trim())N.push([l.trim()])})}})};
+ walk(noteEl);
+ if(N.length){R.push([&quot;&quot;],[&quot;Notes&quot;]);N.forEach(r=&gt;R.push(r))}
+ const w=Math.max(...R.map(r=&gt;r.length));
+ return R.map(r=&gt;{r=r.slice();while(r.length&lt;w)r.push(&quot;&quot;);return r})};
 $(&quot;cp&quot;).onclick=()=&gt;{const tx=rowsT().map(r=&gt;r.join(&quot;\t&quot;)).join(&quot;\n&quot;);
  const ok=()=&gt;{$(&quot;ok&quot;).textContent=&quot;Copied ✓&quot;;setTimeout(()=&gt;$(&quot;ok&quot;).textContent=&quot;&quot;,2000)};
  const fb=()=&gt;{const a=document.createElement(&quot;textarea&quot;);a.value=tx;document.body.appendChild(a);a.select();try{document.execCommand(&quot;copy&quot;);ok()}catch(e){}a.remove()};
  navigator.clipboard&amp;&amp;window.isSecureContext?navigator.clipboard.writeText(tx).then(ok,fb):fb()};
-$(&quot;csv&quot;).onclick=()=&gt;{const q=v=&gt;&#x27;&quot;&#x27;+String(v).replace(/&quot;/g,&#x27;&quot;&quot;&#x27;)+&#x27;&quot;&#x27;;
- const b=new Blob([&quot;\ufeff&quot;+rowsT().map(r=&gt;r.map(q).join(&quot;,&quot;)).join(&quot;\n&quot;)],{type:&quot;text/csv&quot;});
- const a=document.createElement(&quot;a&quot;);a.href=URL.createObjectURL(b);a.download=&quot;duty-schedule-&quot;+$(&quot;m&quot;).value+&quot;.csv&quot;;document.body.appendChild(a);a.click();a.remove()};
+$(&quot;xl&quot;).onclick=async()=&gt;{
+ if(!window.ExcelJS){alert(&quot;Excel library load hoyni. Internet connection check korun.&quot;);return}
+ const R=rowsT(),NC=1+CO.length,wb=new ExcelJS.Workbook(),ws=wb.addWorksheet(&quot;Duty Schedule&quot;);
+ const bd={style:&quot;thin&quot;,color:{argb:&quot;FF000000&quot;}},B={top:bd,left:bd,bottom:bd,right:bd};
+ const iT=R.findIndex(r=&gt;r[0]===&quot;Technician Teams&quot;),iN=R.findIndex(r=&gt;r[0]===&quot;Night Teams&quot;),iO=R.findIndex(r=&gt;r[0]===&quot;Notes&quot;);
+ R.forEach(r=&gt;ws.addRow(r));
+ const box=(i,c1,c2)=&gt;{for(let j=c1;j&lt;=c2;j++){const c=ws.getCell(i+1,j+1);c.border=B;c.alignment={vertical:&quot;middle&quot;,horizontal:&quot;center&quot;}}};
+ for(let i=0;i&lt;=iT-2;i++)box(i,0,NC-1);
+ ws.getRow(1).font={bold:true};
+ let s0=1;for(let j=2;j&lt;=NC;j++){if(j===NC||String(R[0][j]).trim()!==&quot;&quot;){if(j-1&gt;s0)ws.mergeCells(1,s0+1,1,j);s0=j}}
+ const endN=iO&gt;=0?iO-2:R.length-1;
+ for(let i=iT+1;i&lt;=iN-2;i++)box(i,0,3);
+ for(let i=iN+1;i&lt;=endN;i++)box(i,0,3);
+ [iT,iT+1,iN,iN+1,iO].forEach(i=&gt;{if(i&gt;=0)ws.getRow(i+1).font={bold:true,size:i===iT||i===iN||i===iO?12:11}});
+ if(iO&gt;=0)for(let i=iO+1;i&lt;R.length;i++){const r=R[i];let last=-1,cnt=0;r.forEach((v,j)=&gt;{if(String(v).trim()!==&quot;&quot;){last=j;cnt++}});
+  if(last&lt;0)continue;
+  if(cnt===1&amp;&amp;last===0){ws.mergeCells(i+1,1,i+1,6);const c=ws.getCell(i+1,1);c.alignment={vertical:&quot;top&quot;,horizontal:&quot;left&quot;,wrapText:true};for(let j=1;j&lt;=6;j++)ws.getCell(i+1,j).border=B;ws.getRow(i+1).height=Math.max(15,15*Math.ceil(String(r[0]).length/70))}
+  else box(i,0,last)}
+ for(let j=0;j&lt;NC;j++){let m=8;for(let i=1;i&lt;=iT-2;i++)m=Math.max(m,String(R[i][j]||&quot;&quot;).length+2);
+  if(j&lt;4)for(let i=iT+1;i&lt;=endN;i++)m=Math.max(m,String(R[i][j]||&quot;&quot;).length+2);
+  ws.getColumn(j+1).width=Math.min(m,28)}
+ const buf=await wb.xlsx.writeBuffer();
+ const b=new Blob([buf],{type:&quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;});
+ const a=document.createElement(&quot;a&quot;);a.href=URL.createObjectURL(b);a.download=&quot;duty-schedule-&quot;+$(&quot;m&quot;).value+&quot;.xlsx&quot;;document.body.appendChild(a);a.click();a.remove()};
 window.addEventListener(&quot;message&quot;,e=&gt;{
  const d=e.data;if(!d||d.t!==&quot;roster-sync&quot;||!d.a)return;
  const al={&quot;ABU SAYED&quot;:&quot;SAYED&quot;,&quot;BASHUDEB&quot;:&quot;BASUDEB&quot;,&quot;BASUDEV&quot;:&quot;BASUDEB&quot;};
