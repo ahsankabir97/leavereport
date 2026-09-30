@@ -285,11 +285,11 @@ textarea{min-height:88px;resize:vertical;}
 
 /* Duty Schedule full-screen mode */
 .layout.sched-full .sidebar{display:none}
-.layout.sched-full .main{padding:4px}
-.layout.sched-full #p-schedule iframe{height:calc(100vh - 8px);border-radius:8px}
+.layout.sched-full .main{padding:4px;overflow:hidden}
+.layout.sched-full #p-schedule iframe{height:calc(100vh - 16px);border-radius:8px}
 @media(max-width:768px){
-  .layout.sched-full .main{padding:3.4rem 4px 4px}
-  .layout.sched-full #p-schedule iframe{height:calc(100vh - 4rem)}
+  .layout.sched-full .main{padding:3.4rem 4px 4px;overflow:hidden}
+  .layout.sched-full #p-schedule iframe{height:calc(100vh - 4.4rem)}
 }
 </style>
 
@@ -756,13 +756,16 @@ const G=[
 {g:&quot;11:00 AM – 8:00 PM&quot;,s:&quot;E&quot;,t:&quot;e&quot;,d:[&quot;&quot;,&quot;AMIT&quot;]},
 {g:&quot;2:59 PM – 11:59 PM&quot;,s:&quot;E&quot;,t:&quot;e&quot;,d:[&quot;BASUDEB&quot;]},
 {g:&quot;Night Zone&quot;,s:&quot;E&quot;,t:&quot;z&quot;,d:[&quot;&quot;]},
-{g:&quot;Night&quot;,s:&quot;E&quot;,t:&quot;e&quot;,d:[&quot;&quot;]},
+{g:&quot;Physical Night&quot;,s:&quot;E&quot;,t:&quot;e&quot;,d:[&quot;&quot;]},
 {g:&quot;Compensatory&quot;,s:&quot;E&quot;,t:&quot;e&quot;,d:[&quot;&quot;]},
 {g:&quot;Technicians · 9:00 AM – 6:00 PM&quot;,s:&quot;T&quot;,t:&quot;t&quot;,d:T},
 {g:&quot;11 AM – 8 PM&quot;,s:&quot;T&quot;,t:&quot;t&quot;,d:[&quot;&quot;]},
 {g:&quot;Night&quot;,s:&quot;T&quot;,t:&quot;n&quot;,d:[&quot;&quot;]},
-{g:&quot;Compensatory&quot;,s:&quot;T&quot;,t:&quot;t&quot;,d:[&quot;&quot;]}];
+{g:&quot;Compensatory&quot;,s:&quot;T&quot;,t:&quot;t&quot;,d:[&quot;&quot;]},
+{g:&quot;Logical Night&quot;,s:&quot;E&quot;,t:&quot;e&quot;,d:[&quot;&quot;]}];
 const C=[];G.forEach((g,gi)=&gt;g.d.forEach((v,i)=&gt;C.push({gi,i,g:g.g,s:g.s,t:g.t,d:v,first:i===0})));
+// display order: Logical Night (group 11) sits right after Physical Night (group 5); storage order is unchanged
+const ORD=[0,1,2,3,4,5,11,6,7,8,9,10],CO=[];ORD.forEach(g=&gt;C.forEach((c,ci)=&gt;{if(c.gi===g)CO.push(ci)}));
 const TT=&quot;T-30|RONE|Rabinur|Rakib - H;T-31|IBRAHIM|RATUL|Apon - H;T-32|RAJU|Alal|Hasib - H;T-33|MILON KHAN|SUJON|Ujjol - H;T-34|NAZMUL|Taimur|Nurhan - H;T-35|MARUF|Alamin|Asib Kawsar;T-36|Abdul Latif||New Helper&quot;.split(&quot;;&quot;).map(r=&gt;r.split(&quot;|&quot;));
 const NT=&quot;N-1|Ebrahim (Uttara)|Jafor|Hanif;N-2|Bacchu|Mamun Khan (Banasree)|Al-Amin (Motijheel);N-3|Sukon (Mirpur)|Didarul Islam|Rubel Jr.;N-4|Anower (Mirpur)|Timur (Motijheel)|Jashim-353 (Uttara);N-5|Nazmul (Motijheel)|Anis|Bijoy;N-6|Aminul (Mirpur)|Shopon|Rabinur (Motijheel);N-7|Amir|Kalam (Banasree)|Nazrul;N-8|Monir-355 (Uttara)|Latif (Motijheel)|Ratan;N-9|Rahmat|Nuru|Uzzal (Uttara);N-10|Milon (Motijheel)|Mukul|Arfan (Mirpur);N-11|Rahman|Rabiul|Billal (Banasree);N-12|Emran|Imran Jr. (Uttara)|Hossain;N-13|Anis|MD. Alal (Motijheel)|Masum;N-14|Ibrahim (Motijheel)|MD. Mamun Mia (Uttara)|MD. Asadul Islam (Mirpur);N-15|Nurul|Ziaul (Uttara)|Zakir;N-16|Anwor (Mirpur)|Sabbir Fakir (Banasree)|Rabinur (Motijheel)&quot;.split(&quot;;&quot;).map(r=&gt;r.split(&quot;|&quot;));
 let S={days:{},teams:{tt:TT,nt:NT}};
@@ -789,7 +792,8 @@ document.addEventListener(&quot;change&quot;,e=&gt;{const t=e.target;if(!t.datas
      const td=o.parentElement;td.className=cls(C[p[0]],p[1]);td.style.setProperty(&quot;--h&quot;,hue(p[1]))}});
    delete mv[iso][ci];if(!Object.keys(mv[iso]).length)delete mv[iso];fit()}}
  if(!v){t.dataset.pv=t.value;return}
- const others=[...t.closest(&quot;tr&quot;).querySelectorAll(&quot;[data-k]&quot;)].filter(o=&gt;o!==t&amp;&amp;C[+o.dataset.c].t!==&quot;z&quot;&amp;&amp;o.value.trim().toUpperCase()===v);
+ if(tc.gi===11){t.dataset.pv=t.value;return}
+ const others=[...t.closest(&quot;tr&quot;).querySelectorAll(&quot;[data-k]&quot;)].filter(o=&gt;o!==t&amp;&amp;C[+o.dataset.c].t!==&quot;z&quot;&amp;&amp;C[+o.dataset.c].gi!==11&amp;&amp;o.value.trim().toUpperCase()===v);
  if(isNC){ // Night / Compensatory: remove the earlier entries of this name from the row (remembered for undo)
   const mv=S.mv=S.mv||{},iso=t.dataset.k,cur=mv[iso]&amp;&amp;mv[iso][t.dataset.c];
   if(!(cur&amp;&amp;cur.n===v)&amp;&amp;others.length){const ent=[];
@@ -827,9 +831,9 @@ function fit(){
   ds.forEach(d=&gt;{m=Math.max(m,cv.measureText((S.days[d.iso]||[])[ci]||&quot;&quot;).width)});if(c.t===&quot;z&quot;)ZONES.forEach(z=&gt;{m=Math.max(m,cv.measureText(z).width)});
   let w=Math.max(50,Math.ceil(m)+28);
   if(G[c.gi].d.length===1){cv.font=&#x27;600 11px &quot;Exo 2&quot;,&quot;Segoe UI&quot;,sans-serif&#x27;;w=Math.max(w,Math.ceil(cv.measureText(c.g).width)+14)}
-  cols[ci+1].style.width=w+&quot;px&quot;;tot+=w});
+  cols[CO.indexOf(ci)+1].style.width=w+&quot;px&quot;;tot+=w});
  $(&quot;t&quot;).style.width=tot+&quot;px&quot;}
-const cls=(c,v)=&gt;{if(!v)return&quot;&quot;;if(c.s===&quot;E&quot;&amp;&amp;(c.gi===5||c.gi===6))return&quot;o&quot;;return c.t===&quot;t&quot;||c.t===&quot;n&quot;?&quot;tt&quot;:c.t===&quot;z&quot;?&quot;&quot;:&quot;f&quot;};
+const cls=(c,v)=&gt;{if(!v)return&quot;&quot;;if(c.s===&quot;E&quot;&amp;&amp;(c.gi===5||c.gi===6||c.gi===11))return&quot;o&quot;;return c.t===&quot;t&quot;||c.t===&quot;n&quot;?&quot;tt&quot;:c.t===&quot;z&quot;?&quot;&quot;:&quot;f&quot;};
 const cell0=(c,ci,v,iso)=&gt;`&lt;td class=&quot;${cls(c,v)}&quot; style=&quot;--h:${hue(v||&quot;x&quot;)}${c.first&amp;&amp;ci&gt;0?&quot;;border-left:2px solid #4b6358&quot;:&quot;&quot;}&quot;&gt;&lt;input data-k=&quot;${iso}&quot; data-c=&quot;${ci}&quot; list=&quot;${c.s===&quot;T&quot;?&quot;dl-t&quot;:&quot;dl-e&quot;}&quot; value=&quot;${v.replace(/&quot;/g,&quot;&amp;quot;&quot;)}&quot;&gt;&lt;/td&gt;`;
 const ZONES=[&quot;Bashundhara&quot;,&quot;Dhanmondi&quot;,&quot;Uttara&quot;,&quot;Motijheel&quot;,&quot;Banani&quot;,&quot;Mirpur DOHS&quot;,&quot;Banasree&quot;,&quot;Utta/Mir/Banasree&quot;];
 const cell=(c,ci,v,iso)=&gt;{
@@ -838,12 +842,12 @@ const cell=(c,ci,v,iso)=&gt;{
  return `&lt;td class=&quot;${cls(c,v)}&quot;${c.first&amp;&amp;ci&gt;0?` style=&quot;border-left:2px solid #4b6358&quot;`:&quot;&quot;}&gt;&lt;select data-k=&quot;${iso}&quot; data-c=&quot;${ci}&quot;&gt;&lt;option value=&quot;&quot;&gt;&lt;/option&gt;${opts.map(z=&gt;`&lt;option${z===v?&quot; selected&quot;:&quot;&quot;}&gt;${z}&lt;/option&gt;`).join(&quot;&quot;)}&lt;/select&gt;&lt;/td&gt;`};
 function render(){
  let h=&#x27;&lt;thead&gt;&lt;tr class=&quot;g&quot;&gt;&lt;th class=&quot;d&quot; rowspan=&quot;2&quot;&gt;Date&lt;/th&gt;&#x27;;
- G.forEach((g,gi)=&gt;h+=`&lt;th class=&quot;${g.s}${gi%2?&quot; &quot;+g.s.toLowerCase()+&quot;2&quot;:&quot;&quot;}&quot; colspan=&quot;${g.d.length}&quot;&gt;${g.g}&lt;/th&gt;`);
+ ORD.forEach((gi,pos)=&gt;{const g=G[gi];h+=`&lt;th class=&quot;${g.s}${pos%2?&quot; &quot;+g.s.toLowerCase()+&quot;2&quot;:&quot;&quot;}&quot; colspan=&quot;${g.d.length}&quot;&gt;${g.g}&lt;/th&gt;`});
  h+=&#x27;&lt;/tr&gt;&lt;tr class=&quot;s&quot;&gt;&#x27;;
- C.forEach(c=&gt;h+=`&lt;th class=&quot;${c.s.toLowerCase()}2&quot;${c.first?` style=&quot;border-left:2px solid #0b3a2f&quot;`:&quot;&quot;}&gt;${c.t===&quot;t&quot;&amp;&amp;c.s===&quot;T&quot;&amp;&amp;c.gi===7?T[c.i]:c.i+1}&lt;/th&gt;`);
+ CO.forEach(ci=&gt;{const c=C[ci];h+=`&lt;th class=&quot;${c.s.toLowerCase()}2&quot;${c.first?` style=&quot;border-left:2px solid #0b3a2f&quot;`:&quot;&quot;}&gt;${c.t===&quot;t&quot;&amp;&amp;c.s===&quot;T&quot;&amp;&amp;c.gi===7?T[c.i]:c.i+1}&lt;/th&gt;`});
  h+=&quot;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&quot;;
  days().forEach(d=&gt;{const a=S.days[d.iso]||[];
-  h+=`&lt;tr class=&quot;${hol(d.iso)?&quot;we gh&quot;:d.w&gt;=5?&quot;we&quot;:&quot;&quot;}&quot;&gt;&lt;td class=&quot;d&quot;${hol(d.iso)?` title=&quot;${hol(d.iso).replace(/&quot;/g,&quot;&quot;)}&quot;`:&quot;&quot;}&gt;${d.lbl}&lt;/td&gt;`+C.map((c,ci)=&gt;cell(c,ci,a[ci]||&quot;&quot;,d.iso)).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;});
+  h+=`&lt;tr class=&quot;${hol(d.iso)?&quot;we gh&quot;:d.w&gt;=5?&quot;we&quot;:&quot;&quot;}&quot;&gt;&lt;td class=&quot;d&quot;${hol(d.iso)?` title=&quot;${hol(d.iso).replace(/&quot;/g,&quot;&quot;)}&quot;`:&quot;&quot;}&gt;${d.lbl}&lt;/td&gt;`+CO.map(ci=&gt;cell(C[ci],ci,a[ci]||&quot;&quot;,d.iso)).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;});
  $(&quot;t&quot;).innerHTML=&quot;&lt;colgroup&gt;&lt;col&gt;&quot;+C.map(()=&gt;&quot;&lt;col&gt;&quot;).join(&quot;&quot;)+&quot;&lt;/colgroup&gt;&quot;+h+&quot;&lt;/tbody&gt;&quot;;fit();
  $(&quot;tt&quot;).innerHTML=&quot;&lt;tr&gt;&lt;th&gt;Team&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Helper&lt;/th&gt;&lt;/tr&gt;&quot;+S.teams.tt.map((r,i)=&gt;&quot;&lt;tr&gt;&quot;+r.map((v,j)=&gt;`&lt;td&gt;&lt;input data-tm=&quot;tt&quot; data-r=&quot;${i}&quot; data-j=&quot;${j}&quot; size=&quot;${Math.max(8,v.length+3)}&quot; value=&quot;${v}&quot;&gt;&lt;/td&gt;`).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;).join(&quot;&quot;);
  $(&quot;nt&quot;).innerHTML=&quot;&lt;tr&gt;&lt;th&gt;Team&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;/tr&gt;&quot;+S.teams.nt.map((r,i)=&gt;&quot;&lt;tr&gt;&quot;+r.map((v,j)=&gt;`&lt;td&gt;&lt;input data-tm=&quot;nt&quot; data-r=&quot;${i}&quot; data-j=&quot;${j}&quot; size=&quot;${Math.max(8,v.length+3)}&quot; value=&quot;${v}&quot;&gt;&lt;/td&gt;`).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;).join(&quot;&quot;);
@@ -871,7 +875,7 @@ $(&quot;fill&quot;).onclick=()=&gt;{if(!confirm(&quot;Fill this month with defau
 $(&quot;an&quot;).onclick=()=&gt;{const n=(prompt(&quot;New engineer name&quot;)||&quot;&quot;).trim().toUpperCase();if(!n)return;if(!S.list.includes(n)){S.list.push(n);save();setDL()}$(&quot;ok&quot;).textContent=n+&quot; added ✓&quot;;setTimeout(()=&gt;$(&quot;ok&quot;).textContent=&quot;&quot;,2500)};
 $(&quot;rn&quot;).onclick=()=&gt;{const n=(prompt(&quot;Name to remove from the suggestion list:\n&quot;+S.list.join(&quot;, &quot;))||&quot;&quot;).trim().toUpperCase();if(!n||!S.list.includes(n))return;S.list=S.list.filter(x=&gt;x!==n);save();setDL()};
 $(&quot;clr&quot;).onclick=()=&gt;{if(!confirm(&quot;Clear all entries of this month?&quot;))return;days().forEach(d=&gt;{delete S.days[d.iso];if(S.mv)delete S.mv[d.iso]});save();render()};
-const rowsT=()=&gt;[[&quot;Date&quot;].concat(C.map(c=&gt;c.first?c.g:&quot;&quot;))].concat(days().map(d=&gt;[d.lbl].concat(C.map((c,ci)=&gt;(S.days[d.iso]||[])[ci]||&quot;&quot;))));
+const rowsT=()=&gt;[[&quot;Date&quot;].concat(CO.map(ci=&gt;C[ci].first?C[ci].g:&quot;&quot;))].concat(days().map(d=&gt;[d.lbl].concat(CO.map(ci=&gt;(S.days[d.iso]||[])[ci]||&quot;&quot;))));
 $(&quot;cp&quot;).onclick=()=&gt;{const tx=rowsT().map(r=&gt;r.join(&quot;\t&quot;)).join(&quot;\n&quot;);
  const ok=()=&gt;{$(&quot;ok&quot;).textContent=&quot;Copied ✓&quot;;setTimeout(()=&gt;$(&quot;ok&quot;).textContent=&quot;&quot;,2000)};
  const fb=()=&gt;{const a=document.createElement(&quot;textarea&quot;);a.value=tx;document.body.appendChild(a);a.select();try{document.execCommand(&quot;copy&quot;);ok()}catch(e){}a.remove()};
