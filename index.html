@@ -466,12 +466,13 @@ const H2026={&quot;02-04&quot;:&quot;Shab-e-Barat&quot;,&quot;03-17&quot;:&quot;
 const pad=n=&gt;String(n).padStart(2,&quot;0&quot;);
 const $=id=&gt;document.getElementById(id);
 const NH=[150,210,270,330,25,185,50,0];
-const hue=x=&gt;NH[Math.max(0,names().indexOf(x))%NH.length];
+const HM={TAMIM:330,AMIT:275,BASHUDEB:85,BASUDEB:85,MARUF:50,&quot;ABU SAYED&quot;:190,SAYED:190},XH=[15,305,215,120,355,70,170,255];
+const hue=x=&gt;{const k=String(x||&quot;&quot;).toUpperCase();if(k in HM)return HM[k];const i=names().indexOf(x);return XH[Math.max(0,i-5)%XH.length]};
 let store={assign:{},custom:{},names:[]};
 try{const s=localStorage.getItem(&quot;roster-en-v1&quot;);if(s)store=Object.assign(store,JSON.parse(s))}catch(e){}
 let CS=null;const save=()=&gt;{try{localStorage.setItem(&quot;roster-en-v1&quot;,JSON.stringify(store))}catch(e){}if(CS)CS.push()};
 const names=()=&gt;DEF.concat(store.names);
-const now=new Date();$(&quot;m&quot;).value=now.getFullYear()+&quot;-&quot;+pad(now.getMonth()+1);
+const now=new Date();const dm=new Date(now.getFullYear(),now.getMonth()+(now.getDate()&gt;20?1:0),1);$(&quot;m&quot;).value=dm.getFullYear()+&quot;-&quot;+pad(dm.getMonth()+1);
 
 function holidayOf(y,mo,d){
   const k=pad(mo)+&quot;-&quot;+pad(d),iso=y+&quot;-&quot;+k;
@@ -503,7 +504,7 @@ function render(){
     html+=`&lt;tr class=&quot;${cls}&quot;${sty}&gt;&lt;td class=&quot;c&quot;&gt;&lt;b&gt;${r.d} ${MON[r.mo-1].slice(0,3)} ${r.y}&lt;/b&gt;&lt;/td&gt;&lt;td class=&quot;c&quot;&gt;${DAYS[r.w]}${wknd?`&lt;span class=&quot;tag&quot;&gt;Week ${wi+1}&lt;/span&gt;`:&quot;&quot;}&lt;/td&gt;&lt;td class=&quot;h&quot;&gt;${type}&lt;/td&gt;${sels}&lt;/tr&gt;`;
   });
   $(&quot;body&quot;).innerHTML=html||&#x27;&lt;tr&gt;&lt;td colspan=&quot;6&quot; class=&quot;e&quot;&gt;No holidays this month&lt;/td&gt;&lt;/tr&gt;&#x27;;
-  $(&quot;sum&quot;).innerHTML=all.map((x,i)=&gt;`&lt;div style=&quot;--h:${NH[i%NH.length]}&quot;&gt;${x}&lt;b&gt;${cnt[x]} day${cnt[x]===1?&quot;&quot;:&quot;s&quot;}&lt;/b&gt;&lt;/div&gt;`).join(&quot;&quot;);
+  $(&quot;sum&quot;).innerHTML=all.map((x,i)=&gt;`&lt;div style=&quot;--h:${hue(x)}&quot;&gt;${x}&lt;b&gt;${cnt[x]} day${cnt[x]===1?&quot;&quot;:&quot;s&quot;}&lt;/b&gt;&lt;/div&gt;`).join(&quot;&quot;);
   if($(&quot;rep&quot;).style.display===&quot;block&quot;) report();
 }
 const fmt=r=&gt;`${r.d} ${MON[r.mo-1].slice(0,3)} ${r.y}`;
@@ -647,20 +648,29 @@ button:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,0,0,.14)}
 .ok{color:#0d9b60;font-weight:600}
 .sc{overflow:auto;max-height:calc(100vh - 46px);border:1px solid #cfd3cc;border-radius:8px;background:#fff}
 table{border-collapse:separate;border-spacing:0;font-size:11px;text-align:center}
-th,td{border-right:1px solid #d6d9d2;border-bottom:1px solid #d6d9d2;padding:0}
+th,td{border-right:1px solid #9fb0a8;border-bottom:1px solid #9fb0a8;padding:0}
 th{position:sticky;color:#fff;padding:0 4px;font-weight:600;white-space:nowrap;z-index:2}
 tr.g th{top:0;height:20px;line-height:20px;font-size:11px}tr.s th{top:20px;height:15px;line-height:15px;font-size:10px;padding:0}
 th.E{background:#1f6f5c}th.T{background:#4c3bb0}th.e2{background:#2c8a73}th.t2{background:#6552c9}
 td.d,th.d{position:sticky;left:0;z-index:3;min-width:160px;text-align:left;padding:0 6px;font-weight:600;font-size:11px;line-height:17px;background:#fff;white-space:nowrap}
 th.d{background:#14463a;z-index:4}
-tr.we td.d{background:#ffedd5;color:#9a3412}
-tr.we td:not(.f):not(.tt){background:#ffedd5}
+tr.we td.d{background:#fcd5bd;color:#9a3412}
+tr.we td:not(.f):not(.tt):not(.o){background:#fcd5bd}
+tr.gh td.d{background:#fcd5bd;color:#9a3412}
+tr.gh td:not(.f):not(.tt):not(.o){background:#fcd5bd}
+td.o{background:#ea580c}td.o input{font-weight:800;color:#fff}
+td input::-webkit-calendar-picker-indicator{display:none !important;opacity:0}
+td input{text-align:center !important;text-overflow:clip}
 #t{table-layout:fixed}
 td input{width:100%;height:17px;border:0;border-radius:0;background:transparent;text-align:center;padding:0 1px;font-size:11px;font-weight:500;display:block}
 td select{width:100%;height:17px;border:0;border-radius:0;background:transparent;text-align:center;text-align-last:center;padding:0;font:inherit;font-size:11px;font-weight:700;display:block;-webkit-appearance:none;appearance:none;cursor:pointer;color:#1f2421}
 td select:focus{outline:2px solid #0d9b60;outline-offset:-2px}
+tr.g th{border-left:2px solid #0b3a2f}
+tbody tr:hover td{box-shadow:inset 0 1px 0 #0d9b60,inset 0 -1px 0 #0d9b60}
+td input:hover,td select:hover{background:rgba(13,155,96,.16)}
+td:focus-within{box-shadow:inset 0 0 0 2px #0d9b60 !important;background-image:linear-gradient(rgba(255,255,255,.35),rgba(255,255,255,.35))}
 td input:focus{outline:2px solid #0d9b60;outline-offset:-2px}
-td.f{background:hsl(var(--h) 75% 89%)}td.f input{font-weight:800;color:hsl(var(--h) 65% 20%)}
+td.f{background:hsl(var(--h) 80% 82%)}td.f input{font-weight:800;color:hsl(var(--h) 65% 20%)}
 td.tt{background:#ece8ff}td.tt input{font-weight:800;color:#3b2f99}
 .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
 .tb{overflow:auto;border:1px solid #cfd3cc;border-radius:8px;background:#fff}
@@ -711,14 +721,35 @@ window.addEventListener(&quot;storage&quot;,e=&gt;{if(e.key===&quot;roster-en-v1
 document.addEventListener(&quot;focusin&quot;,e=&gt;{const t=e.target;if(t.dataset&amp;&amp;t.dataset.k)t.dataset.pv=t.value});
 document.addEventListener(&quot;change&quot;,e=&gt;{const t=e.target;if(!t.dataset||!t.dataset.k)return;
  if(C[+t.dataset.c].t===&quot;z&quot;)return;
- const v=t.value.trim().toUpperCase();if(!v){t.dataset.pv=t.value;return}
- const dup=[...t.closest(&quot;tr&quot;).querySelectorAll(&quot;[data-k]&quot;)].find(o=&gt;o!==t&amp;&amp;C[+o.dataset.c].t!==&quot;z&quot;&amp;&amp;o.value.trim().toUpperCase()===v);
+ const v=t.value.trim().toUpperCase();
+ const tc=C[+t.dataset.c],isNC=tc.s===&quot;E&quot;&amp;&amp;(tc.gi===5||tc.gi===6);
+ if(isNC){const mv=S.mv=S.mv||{},iso=t.dataset.k,ci=t.dataset.c,rec=mv[iso]&amp;&amp;mv[iso][ci];
+  if(rec&amp;&amp;rec.n!==v){const tr=t.closest(&quot;tr&quot;); // name removed/changed: put the old name back where it was
+   rec.c.forEach(p=&gt;{const o=tr.querySelector(&#x27;[data-c=&quot;&#x27;+p[0]+&#x27;&quot;]&#x27;);
+    if(o&amp;&amp;!o.value.trim()){o.value=p[1];const a=(S.days[iso]||[]).slice();a[p[0]]=p[1];S.days[iso]=a;
+     const td=o.parentElement;td.className=cls(C[p[0]],p[1]);td.style.setProperty(&quot;--h&quot;,hue(p[1]))}});
+   delete mv[iso][ci];if(!Object.keys(mv[iso]).length)delete mv[iso];fit()}}
+ if(!v){t.dataset.pv=t.value;return}
+ const others=[...t.closest(&quot;tr&quot;).querySelectorAll(&quot;[data-k]&quot;)].filter(o=&gt;o!==t&amp;&amp;C[+o.dataset.c].t!==&quot;z&quot;&amp;&amp;o.value.trim().toUpperCase()===v);
+ if(isNC){ // Night / Compensatory: remove the earlier entries of this name from the row (remembered for undo)
+  const mv=S.mv=S.mv||{},iso=t.dataset.k,cur=mv[iso]&amp;&amp;mv[iso][t.dataset.c];
+  if(!(cur&amp;&amp;cur.n===v)&amp;&amp;others.length){const ent=[];
+   others.forEach(o=&gt;{const oc=+o.dataset.c,oc2=C[oc],r2=mv[iso]&amp;&amp;mv[iso][oc];
+    if(oc2.s===&quot;E&quot;&amp;&amp;(oc2.gi===5||oc2.gi===6)&amp;&amp;r2){r2.c.forEach(p=&gt;ent.push(p));delete mv[iso][oc]}else ent.push([oc,o.value.trim()])});
+   (mv[iso]=mv[iso]||{})[t.dataset.c]={n:v,c:ent}}
+  others.forEach(o=&gt;{o.value=&quot;&quot;;const a=(S.days[o.dataset.k]||[]).slice();a[+o.dataset.c]=&quot;&quot;;S.days[o.dataset.k]=a;
+   const td=o.parentElement;td.className=cls(C[+o.dataset.c],&quot;&quot;);td.style.setProperty(&quot;--h&quot;,hue(&quot;x&quot;))});
+  if(others.length)fit();t.dataset.pv=t.value;return}
+ const dup=others[0];
  if(dup){const g=C[+dup.dataset.c];alert(&quot;Warning: &quot;+t.value.trim().toUpperCase()+&quot; is already assigned in this row (&quot;+g.g+&quot; - column &quot;+(g.i+1)+&quot;).\nThe same name cannot be added twice on the same date.&quot;);
   t.value=t.dataset.pv||&quot;&quot;;return}
  t.dataset.pv=t.value},true);
 $(&quot;menu&quot;).onclick=()=&gt;{parent.postMessage({t:&quot;sched-menu&quot;},&quot;*&quot;)};
-const now=new Date();$(&quot;m&quot;).value=now.getFullYear()+&quot;-&quot;+pad(now.getMonth()+1);
-const hue=n=&gt;Math.abs([...n].reduce((a,c)=&gt;(a*31+c.charCodeAt(0))|0,7))%360;
+const now=new Date();const dm=new Date(now.getFullYear(),now.getMonth()+(now.getDate()&gt;20?1:0),1);$(&quot;m&quot;).value=dm.getFullYear()+&quot;-&quot;+pad(dm.getMonth()+1);
+const HM={ARIF:235,AHSAN:155,MARUF:50,SAYED:190,TAMIM:330,AMIT:275,BASUDEB:85},XH=[15,305,215,120,355,70,170,255];
+const hue=n=&gt;{const k=String(n||&quot;&quot;).toUpperCase();if(k in HM)return HM[k];
+ const i=(S.list||[]).indexOf(k);if(i&gt;=7)return XH[(i-7)%XH.length];
+ return Math.abs([...k].reduce((a,c)=&gt;(a*31+c.charCodeAt(0))|0,7))%360};
 const days=()=&gt;{const [y,m]=$(&quot;m&quot;).value.split(&quot;-&quot;).map(Number),out=[];if(!y)return out;
  for(let d=1;d&lt;=new Date(y,m,0).getDate();d++){const dt=new Date(y,m-1,d);out.push({dt,iso:y+&quot;-&quot;+pad(m)+&quot;-&quot;+pad(d),i:d-1,w:dt.getDay(),lbl:dt.toLocaleDateString(&quot;en-US&quot;,{weekday:&quot;long&quot;,year:&quot;numeric&quot;,month:&quot;long&quot;,day:&quot;numeric&quot;})})}return out};
 const cv=document.createElement(&quot;canvas&quot;).getContext(&quot;2d&quot;);
@@ -730,21 +761,21 @@ function fit(){
   if(G[c.gi].d.length===1){cv.font=&#x27;600 11px &quot;Exo 2&quot;,&quot;Segoe UI&quot;,sans-serif&#x27;;w=Math.max(w,Math.ceil(cv.measureText(c.g).width)+14)}
   cols[ci+1].style.width=w+&quot;px&quot;;tot+=w});
  $(&quot;t&quot;).style.width=tot+&quot;px&quot;}
-const cls=(c,v)=&gt;{if(!v)return&quot;&quot;;return c.t===&quot;t&quot;||c.t===&quot;n&quot;?&quot;tt&quot;:c.t===&quot;z&quot;?&quot;&quot;:&quot;f&quot;};
-const cell0=(c,ci,v,iso)=&gt;`&lt;td class=&quot;${cls(c,v)}&quot; style=&quot;--h:${hue(v||&quot;x&quot;)}&quot;&gt;&lt;input data-k=&quot;${iso}&quot; data-c=&quot;${ci}&quot; list=&quot;${c.s===&quot;T&quot;?&quot;dl-t&quot;:&quot;dl-e&quot;}&quot; value=&quot;${v.replace(/&quot;/g,&quot;&amp;quot;&quot;)}&quot;&gt;&lt;/td&gt;`;
+const cls=(c,v)=&gt;{if(!v)return&quot;&quot;;if(c.s===&quot;E&quot;&amp;&amp;(c.gi===5||c.gi===6))return&quot;o&quot;;return c.t===&quot;t&quot;||c.t===&quot;n&quot;?&quot;tt&quot;:c.t===&quot;z&quot;?&quot;&quot;:&quot;f&quot;};
+const cell0=(c,ci,v,iso)=&gt;`&lt;td class=&quot;${cls(c,v)}&quot; style=&quot;--h:${hue(v||&quot;x&quot;)}${c.first&amp;&amp;ci&gt;0?&quot;;border-left:2px solid #4b6358&quot;:&quot;&quot;}&quot;&gt;&lt;input data-k=&quot;${iso}&quot; data-c=&quot;${ci}&quot; list=&quot;${c.s===&quot;T&quot;?&quot;dl-t&quot;:&quot;dl-e&quot;}&quot; value=&quot;${v.replace(/&quot;/g,&quot;&amp;quot;&quot;)}&quot;&gt;&lt;/td&gt;`;
 const ZONES=[&quot;Bashundhara&quot;,&quot;Dhanmondi&quot;,&quot;Uttara&quot;,&quot;Motijheel&quot;,&quot;Banani&quot;,&quot;Mirpur DOHS&quot;,&quot;Banasree&quot;,&quot;Utta/Mir/Banasree&quot;];
 const cell=(c,ci,v,iso)=&gt;{
  if(c.t!==&quot;z&quot;)return cell0(c,ci,v,iso);
  const opts=ZONES.slice();if(v&amp;&amp;!opts.includes(v))opts.push(v);
- return `&lt;td class=&quot;${cls(c,v)}&quot;&gt;&lt;select data-k=&quot;${iso}&quot; data-c=&quot;${ci}&quot;&gt;&lt;option value=&quot;&quot;&gt;&lt;/option&gt;${opts.map(z=&gt;`&lt;option${z===v?&quot; selected&quot;:&quot;&quot;}&gt;${z}&lt;/option&gt;`).join(&quot;&quot;)}&lt;/select&gt;&lt;/td&gt;`};
+ return `&lt;td class=&quot;${cls(c,v)}&quot;${c.first&amp;&amp;ci&gt;0?` style=&quot;border-left:2px solid #4b6358&quot;`:&quot;&quot;}&gt;&lt;select data-k=&quot;${iso}&quot; data-c=&quot;${ci}&quot;&gt;&lt;option value=&quot;&quot;&gt;&lt;/option&gt;${opts.map(z=&gt;`&lt;option${z===v?&quot; selected&quot;:&quot;&quot;}&gt;${z}&lt;/option&gt;`).join(&quot;&quot;)}&lt;/select&gt;&lt;/td&gt;`};
 function render(){
  let h=&#x27;&lt;thead&gt;&lt;tr class=&quot;g&quot;&gt;&lt;th class=&quot;d&quot; rowspan=&quot;2&quot;&gt;Date&lt;/th&gt;&#x27;;
  G.forEach((g,gi)=&gt;h+=`&lt;th class=&quot;${g.s}${gi%2?&quot; &quot;+g.s.toLowerCase()+&quot;2&quot;:&quot;&quot;}&quot; colspan=&quot;${g.d.length}&quot;&gt;${g.g}&lt;/th&gt;`);
  h+=&#x27;&lt;/tr&gt;&lt;tr class=&quot;s&quot;&gt;&#x27;;
- C.forEach(c=&gt;h+=`&lt;th class=&quot;${c.s.toLowerCase()}2&quot;&gt;${c.t===&quot;t&quot;&amp;&amp;c.s===&quot;T&quot;&amp;&amp;c.gi===7?T[c.i]:c.i+1}&lt;/th&gt;`);
+ C.forEach(c=&gt;h+=`&lt;th class=&quot;${c.s.toLowerCase()}2&quot;${c.first?` style=&quot;border-left:2px solid #0b3a2f&quot;`:&quot;&quot;}&gt;${c.t===&quot;t&quot;&amp;&amp;c.s===&quot;T&quot;&amp;&amp;c.gi===7?T[c.i]:c.i+1}&lt;/th&gt;`);
  h+=&quot;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&quot;;
  days().forEach(d=&gt;{const a=S.days[d.iso]||[];
-  h+=`&lt;tr class=&quot;${d.w&gt;=5||hol(d.iso)?&quot;we&quot;:&quot;&quot;}&quot;&gt;&lt;td class=&quot;d&quot;${hol(d.iso)?` title=&quot;${hol(d.iso).replace(/&quot;/g,&quot;&quot;)}&quot;`:&quot;&quot;}&gt;${d.lbl}&lt;/td&gt;`+C.map((c,ci)=&gt;cell(c,ci,a[ci]||&quot;&quot;,d.iso)).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;});
+  h+=`&lt;tr class=&quot;${hol(d.iso)?&quot;we gh&quot;:d.w&gt;=5?&quot;we&quot;:&quot;&quot;}&quot;&gt;&lt;td class=&quot;d&quot;${hol(d.iso)?` title=&quot;${hol(d.iso).replace(/&quot;/g,&quot;&quot;)}&quot;`:&quot;&quot;}&gt;${d.lbl}&lt;/td&gt;`+C.map((c,ci)=&gt;cell(c,ci,a[ci]||&quot;&quot;,d.iso)).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;});
  $(&quot;t&quot;).innerHTML=&quot;&lt;colgroup&gt;&lt;col&gt;&quot;+C.map(()=&gt;&quot;&lt;col&gt;&quot;).join(&quot;&quot;)+&quot;&lt;/colgroup&gt;&quot;+h+&quot;&lt;/tbody&gt;&quot;;fit();
  $(&quot;tt&quot;).innerHTML=&quot;&lt;tr&gt;&lt;th&gt;Team&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Helper&lt;/th&gt;&lt;/tr&gt;&quot;+S.teams.tt.map((r,i)=&gt;&quot;&lt;tr&gt;&quot;+r.map((v,j)=&gt;`&lt;td&gt;&lt;input data-tm=&quot;tt&quot; data-r=&quot;${i}&quot; data-j=&quot;${j}&quot; size=&quot;${Math.max(8,v.length+3)}&quot; value=&quot;${v}&quot;&gt;&lt;/td&gt;`).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;).join(&quot;&quot;);
  $(&quot;nt&quot;).innerHTML=&quot;&lt;tr&gt;&lt;th&gt;Team&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;/tr&gt;&quot;+S.teams.nt.map((r,i)=&gt;&quot;&lt;tr&gt;&quot;+r.map((v,j)=&gt;`&lt;td&gt;&lt;input data-tm=&quot;nt&quot; data-r=&quot;${i}&quot; data-j=&quot;${j}&quot; size=&quot;${Math.max(8,v.length+3)}&quot; value=&quot;${v}&quot;&gt;&lt;/td&gt;`).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;).join(&quot;&quot;);
@@ -760,7 +791,7 @@ $(&quot;m&quot;).onchange=render;
 const sh=k=&gt;{const [y,m]=$(&quot;m&quot;).value.split(&quot;-&quot;).map(Number),d=new Date(y,m-1+k,1);$(&quot;m&quot;).value=d.getFullYear()+&quot;-&quot;+pad(d.getMonth()+1);render()};
 $(&quot;prev&quot;).onclick=()=&gt;sh(-1);$(&quot;next&quot;).onclick=()=&gt;sh(1);
 $(&quot;fill&quot;).onclick=()=&gt;{if(!confirm(&quot;Fill this month with default duty pattern? Existing entries of this month will be replaced.&quot;))return;
- days().forEach(d=&gt;{const w=d.w,nn=&quot;N-&quot;+(Math.floor(d.i/2)%16+1);
+ days().forEach(d=&gt;{if(S.mv)delete S.mv[d.iso];const w=d.w,nn=&quot;N-&quot;+(Math.floor(d.i/2)%16+1);
   S.days[d.iso]=C.map(c=&gt;{
    if(c.t===&quot;n&quot;)return nn;
    if(c.s===&quot;T&quot;&amp;&amp;c.gi===7){const off=w===5?[&quot;T-30&quot;,&quot;T-34&quot;,&quot;T-35&quot;]:w===6?[&quot;T-31&quot;,&quot;T-32&quot;,&quot;T-33&quot;,&quot;T-36&quot;]:T;return off.includes(c.d)?c.d:&quot;&quot;}
@@ -771,7 +802,7 @@ $(&quot;fill&quot;).onclick=()=&gt;{if(!confirm(&quot;Fill this month with defau
  save();render()};
 $(&quot;an&quot;).onclick=()=&gt;{const n=(prompt(&quot;New engineer name&quot;)||&quot;&quot;).trim().toUpperCase();if(!n)return;if(!S.list.includes(n)){S.list.push(n);save();setDL()}$(&quot;ok&quot;).textContent=n+&quot; added ✓&quot;;setTimeout(()=&gt;$(&quot;ok&quot;).textContent=&quot;&quot;,2500)};
 $(&quot;rn&quot;).onclick=()=&gt;{const n=(prompt(&quot;Name to remove from the suggestion list:\n&quot;+S.list.join(&quot;, &quot;))||&quot;&quot;).trim().toUpperCase();if(!n||!S.list.includes(n))return;S.list=S.list.filter(x=&gt;x!==n);save();setDL()};
-$(&quot;clr&quot;).onclick=()=&gt;{if(!confirm(&quot;Clear all entries of this month?&quot;))return;days().forEach(d=&gt;delete S.days[d.iso]);save();render()};
+$(&quot;clr&quot;).onclick=()=&gt;{if(!confirm(&quot;Clear all entries of this month?&quot;))return;days().forEach(d=&gt;{delete S.days[d.iso];if(S.mv)delete S.mv[d.iso]});save();render()};
 const rowsT=()=&gt;[[&quot;Date&quot;].concat(C.map(c=&gt;c.first?c.g:&quot;&quot;))].concat(days().map(d=&gt;[d.lbl].concat(C.map((c,ci)=&gt;(S.days[d.iso]||[])[ci]||&quot;&quot;))));
 $(&quot;cp&quot;).onclick=()=&gt;{const tx=rowsT().map(r=&gt;r.join(&quot;\t&quot;)).join(&quot;\n&quot;);
  const ok=()=&gt;{$(&quot;ok&quot;).textContent=&quot;Copied ✓&quot;;setTimeout(()=&gt;$(&quot;ok&quot;).textContent=&quot;&quot;,2000)};
@@ -799,7 +830,7 @@ window.addEventListener(&quot;message&quot;,e=&gt;{
    if(ci&gt;=0)row[ci]=nm;
    if(!S.list.includes(nm)){S.list.push(nm);added=true}
   });
-  S.days[iso]=row;n++;
+  S.days[iso]=row;if(S.mv)delete S.mv[iso];n++;
  });
  if(added)setDL();
  save();render();
@@ -839,11 +870,12 @@ function cloudSync(path,getMap,applyMap){
  return {push};
 }
 
-const smap=()=&gt;{const m={};Object.keys(S.days).forEach(k=&gt;{m[&quot;days/&quot;+k]=JSON.stringify(S.days[k])});m.teams=JSON.stringify(S.teams);m.list=JSON.stringify(S.list);return m};
+const smap=()=&gt;{const m={};Object.keys(S.days).forEach(k=&gt;{m[&quot;days/&quot;+k]=JSON.stringify(S.days[k])});Object.keys(S.mv||{}).forEach(k=&gt;{m[&quot;mv/&quot;+k]=JSON.stringify(S.mv[k])});m.teams=JSON.stringify(S.teams);m.list=JSON.stringify(S.list);return m};
 let needR=false;document.addEventListener(&quot;focusout&quot;,()=&gt;{if(needR){needR=false;setTimeout(render,80)}});
 const sapply=m=&gt;{const days={};
  Object.keys(m).forEach(k=&gt;{if(k.indexOf(&quot;days/&quot;)===0){try{days[k.slice(5)]=JSON.parse(m[k])}catch(e){}}});
  S.days=days;
+ {const mv={};Object.keys(m).forEach(k=&gt;{if(k.indexOf(&quot;mv/&quot;)===0){try{mv[k.slice(3)]=JSON.parse(m[k])}catch(e){}}});S.mv=mv}
  try{if(m.teams)S.teams=JSON.parse(m.teams)}catch(e){}
  try{if(m.list){S.list=JSON.parse(m.list);setDL()}}catch(e){}
  try{localStorage.setItem(&quot;sched-v1&quot;,JSON.stringify(S))}catch(e){}
