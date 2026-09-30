@@ -75,7 +75,24 @@ body,input,select,textarea,button{font-family:'Inter',sans-serif;}
 .nav-btn:hover i{transform:scale(1.15);color:#34d399;}
 .nav-btn.active{background:linear-gradient(90deg,rgba(52,211,153,0.24),rgba(52,211,153,0.05));color:#fff;border-left:3px solid var(--color-sidebar-accent);padding-left:calc(1.4rem - 3px);box-shadow:0 4px 16px rgba(52,211,153,0.22);}
 .nav-btn.active i{color:var(--color-sidebar-accent);}
+
+/* Glass effect only on the 3 main navigation bars */
+.sb-glass{margin:.5rem 0 0;padding:0;background:none;border:none;box-shadow:none;}
+.sb-glass .sb-section{text-align:center;border-radius:999px;color:#fff;font-weight:800;letter-spacing:.2em;background:linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.06));border:1px solid rgba(255,255,255,0.22);box-shadow:0 4px 14px rgba(0,0,0,0.2);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
 .sb-foot{margin-top:auto;padding:.9rem 1.4rem;border-top:0.5px solid rgba(255,255,255,0.08);font-size:12px;font-weight:600;color:rgba(255,255,255,0.35);display:flex;align-items:center;gap:8px;}
+/* Sidebar auto-fit: everything visible without scrolling (scales with window height) */
+.sidebar{overflow-y:auto;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:clamp(.5rem,2vh,1.4rem) 1.2rem clamp(.5rem,1.6vh,1.1rem);}
+.sb-logo>div:first-child{margin-bottom:clamp(4px,1vh,10px) !important;}
+.sb-glass{margin-top:clamp(.15rem,.8vh,.5rem);}
+.sb-glass .sb-section{margin:clamp(.3rem,1vh,.7rem) 10px clamp(.15rem,.5vh,.3rem);padding:clamp(.32rem,1.1vh,.6rem) 1rem;font-size:clamp(11px,1.9vh,12px);}
+.nav-btn{padding-top:clamp(.24rem,1.05vh,.6rem);padding-bottom:clamp(.24rem,1.05vh,.6rem);font-size:clamp(12px,2.1vh,13.5px);}
+#session-bar{padding:clamp(.25rem,.9vh,.65rem) 1.2rem !important;}
+#sync-status{padding:clamp(.2rem,.7vh,.55rem) 1.2rem !important;}
+.sb-foot{padding:clamp(.3rem,1vh,.9rem) 1.2rem;}
+.sb-logo + .sb-glass{margin-top:clamp(.5rem,2.2vh,1.2rem);}
+.sb-glass + .sb-glass{margin-top:clamp(.45rem,2vh,1.1rem);}
 .main{flex:1;padding:1.5rem 1.75rem;overflow-y:auto;height:100%;background:var(--color-background-primary);}
 .page{display:none;}.page.active{display:block;}
 
@@ -305,17 +322,23 @@ textarea{min-height:88px;resize:vertical;}
         <span style="font-size:9px;font-weight:800;color:#34d399;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.10em;text-transform:uppercase;">Motijheel Zone</span>
       </div>
     </div>
+    <div class="sb-glass">
     <div class="sb-section">Leave</div>
     <button class="nav-btn active" onclick="go('leave',this)"><i class="ti ti-calendar-event"></i>Leave Entry</button>
-    <div class="sb-section">Records</div>
-<button class="nav-btn" onclick="go('dash',this)"><i class="ti ti-chart-bar"></i>Dashboard</button>
-<button class="nav-btn" onclick="go('staff-rec',this)"><i class="ti ti-users"></i>Staff Records</button>
-<button class="nav-btn" onclick="go('leave-rec',this)"><i class="ti ti-list-details"></i>Leave Records</button>
-<button class="nav-btn" onclick="go('roster',this)"><i class="ti ti-calendar-user"></i>Offday Duty</button>
-    <button class="nav-btn" onclick="go('schedule',this)"><i class="ti ti-table"></i>Duty Schedule</button>
+    <button class="nav-btn" onclick="go('leave-rec',this)"><i class="ti ti-list-details"></i>Leave Records</button>
+    <button class="nav-btn" onclick="go('dash',this)"><i class="ti ti-chart-bar"></i>Dashboard</button>
+    </div>
+    <div class="sb-glass">
+    <div class="sb-section">Duty Schedule</div>
+    <button class="nav-btn" onclick="go('roster',this)"><i class="ti ti-calendar-user"></i>Offday Duty</button>
+    <button class="nav-btn" onclick="go('schedule',this)"><i class="ti ti-table"></i>Monthly Schedule</button>
+    </div>
+    <div class="sb-glass">
     <div class="sb-section">Staff Entry</div>
     <button class="nav-btn" onclick="go('eng',this)"><i class="ti ti-user-check"></i>Engineer Entry</button>
     <button class="nav-btn" onclick="go('tech',this)"><i class="ti ti-tool"></i>Technician Entry</button>
+    <button class="nav-btn" onclick="go('staff-rec',this)"><i class="ti ti-users"></i>Staff Records</button>
+    </div>
     <div id="session-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:.65rem 1.4rem;margin-top:auto;border-top:0.5px solid rgba(255,255,255,0.08);">
       <div style="display:flex;align-items:center;gap:6px;min-width:0;">
         <i class="ti ti-user-circle" style="font-size:15px;color:#34d399;flex-shrink:0;"></i>
@@ -425,12 +448,32 @@ td.pk{background:hsl(var(--h) 80% 88%) !important}
 td.pk select{color:hsl(var(--h) 70% 20%);font-weight:800}
 td.pk select option{color:#111;background:#fff;font-weight:500}
 .xl td.en[style]{background:hsl(var(--h) 80% 88%);color:hsl(var(--h) 70% 20%);font-weight:800}
+
+/* ===== compact / fit-to-screen ===== */
+.w{max-width:1000px;padding:4px 4px 10px}
+h1{font-size:18px;margin:0 8px 0 0}
+.bar{gap:6px;margin-bottom:6px}
+.bar.top{margin-bottom:6px}
+.bar button,.bar input{padding:4px 10px;font-size:13px;border-radius:6px}
+.sum{gap:6px;margin-bottom:6px}
+.sum div{padding:2px 4px 2px 11px;font-size:12.5px;gap:6px;border-width:1px}
+.sum div b{padding:1px 9px;font-size:11.5px}
+.sc{border-radius:6px}
+table{font-size:13px;min-width:0}
+th{padding:6px 8px;font-size:12px}
+td.c{padding:0 8px}
+td.h{padding:0 8px;min-width:0}
+.tag{font-size:10px;padding:0 7px;margin-left:6px;line-height:16px}
+tr.wk.f td{border-top-width:2px}
+tbody tr{height:var(--rh,30px)}
+td select{height:var(--rh,30px);padding:0 4px;min-width:0;font-size:13px}
+.x{padding:0 3px}
+.e{padding:14px}
 &lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
 &lt;div class=&quot;w&quot;&gt;
-  &lt;h1&gt;Offday Duty&lt;/h1&gt;
-  &lt;div class=&quot;bar&quot;&gt;
+  &lt;div class=&quot;bar top&quot;&gt;&lt;h1&gt;Offday Duty&lt;/h1&gt;
     &lt;button id=&quot;prev&quot;&gt;‹&lt;/button&gt;
     &lt;input type=&quot;month&quot; id=&quot;m&quot;&gt;
     &lt;button id=&quot;next&quot;&gt;›&lt;/button&gt;
@@ -505,8 +548,19 @@ function render(){
   });
   $(&quot;body&quot;).innerHTML=html||&#x27;&lt;tr&gt;&lt;td colspan=&quot;6&quot; class=&quot;e&quot;&gt;No holidays this month&lt;/td&gt;&lt;/tr&gt;&#x27;;
   $(&quot;sum&quot;).innerHTML=all.map((x,i)=&gt;`&lt;div style=&quot;--h:${hue(x)}&quot;&gt;${x}&lt;b&gt;${cnt[x]} day${cnt[x]===1?&quot;&quot;:&quot;s&quot;}&lt;/b&gt;&lt;/div&gt;`).join(&quot;&quot;);
+  fit();
   if($(&quot;rep&quot;).style.display===&quot;block&quot;) report();
 }
+
+function fit(){
+  const sc=document.querySelector(&quot;.sc&quot;),n=$(&quot;body&quot;).rows.length||1;
+  const top=sc.getBoundingClientRect().top+window.scrollY;
+  const th=document.querySelector(&quot;thead&quot;).offsetHeight;
+  const avail=window.innerHeight-top-th-14;
+  const rh=Math.max(24,Math.min(36,Math.floor(avail/n)));
+  document.documentElement.style.setProperty(&quot;--rh&quot;,rh+&quot;px&quot;);
+}
+window.addEventListener(&quot;resize&quot;,fit);
 const fmt=r=&gt;`${r.d} ${MON[r.mo-1].slice(0,3)} ${r.y}`;
 const namesTSV=()=&gt;rows().map(r=&gt;r.a.join(&quot;\t&quot;)).join(&quot;\n&quot;);
 const fullTSV=()=&gt;[&quot;Date\tDay\tHoliday\tEngineer 1\tEngineer 2\tEngineer 3&quot;].concat(rows().map(r=&gt;[fmt(r),DAYS[r.w],r.h||&quot;Weekend&quot;,...r.a].join(&quot;\t&quot;))).join(&quot;\n&quot;);
@@ -609,7 +663,7 @@ const rapply=m=&gt;{const as={},cu={};
  const a=document.activeElement;
  if(a&amp;&amp;a.tagName===&quot;SELECT&quot;&amp;&amp;a.closest&amp;&amp;a.closest(&quot;#body&quot;))needR=true;else render()};
 CS=cloudSync(&quot;roster&quot;,rmap,rapply);
-</script>
+&lt;/script&gt;
 &lt;/body&gt;
 &lt;/html&gt;
 "></iframe>
