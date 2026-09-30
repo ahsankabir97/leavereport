@@ -411,6 +411,10 @@ input,select,button,textarea,th,td,option{font-family:inherit}
 h1,th,button{letter-spacing:.02em}
 td select{font-weight:700}
 .xl td.en{font-weight:700}
+td.pk{background:hsl(var(--h) 80% 88%) !important}
+td.pk select{color:hsl(var(--h) 70% 20%);font-weight:800}
+td.pk select option{color:#111;background:#fff;font-weight:500}
+.xl td.en[style]{background:hsl(var(--h) 80% 88%);color:hsl(var(--h) 70% 20%);font-weight:800}
 &lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
@@ -450,6 +454,8 @@ const FIXED={&quot;02-21&quot;:&quot;Language Martyrs&#x27; Day&quot;,&quot;03-2
 const H2026={&quot;02-04&quot;:&quot;Shab-e-Barat&quot;,&quot;03-17&quot;:&quot;Shab-e-Qadr&quot;,&quot;03-19&quot;:&quot;Eid-ul-Fitr Holiday&quot;,&quot;03-20&quot;:&quot;Jumatul Wida&quot;,&quot;03-21&quot;:&quot;Eid-ul-Fitr&quot;,&quot;03-22&quot;:&quot;Eid-ul-Fitr Holiday&quot;,&quot;03-23&quot;:&quot;Eid-ul-Fitr Holiday&quot;,&quot;04-13&quot;:&quot;Chaitra Sankranti (CHT)&quot;,&quot;05-26&quot;:&quot;Eid-ul-Adha Holiday&quot;,&quot;05-27&quot;:&quot;Eid-ul-Adha Holiday&quot;,&quot;05-28&quot;:&quot;Eid-ul-Adha&quot;,&quot;05-29&quot;:&quot;Eid-ul-Adha Holiday&quot;,&quot;05-30&quot;:&quot;Eid-ul-Adha Holiday&quot;,&quot;05-31&quot;:&quot;Eid-ul-Adha Holiday&quot;,&quot;06-26&quot;:&quot;Ashura&quot;,&quot;08-26&quot;:&quot;Eid-e-Milad-un-Nabi&quot;,&quot;09-04&quot;:&quot;Janmashtami&quot;,&quot;10-20&quot;:&quot;Durga Puja (Nabami)&quot;,&quot;10-21&quot;:&quot;Durga Puja (Bijoya Dashami)&quot;};
 const pad=n=&gt;String(n).padStart(2,&quot;0&quot;);
 const $=id=&gt;document.getElementById(id);
+const NH=[150,210,270,330,25,185,50,0];
+const hue=x=&gt;NH[Math.max(0,names().indexOf(x))%NH.length];
 let store={assign:{},custom:{},names:[]};
 try{const s=localStorage.getItem(&quot;roster-en-v1&quot;);if(s)store=Object.assign(store,JSON.parse(s))}catch(e){}
 const save=()=&gt;{try{localStorage.setItem(&quot;roster-en-v1&quot;,JSON.stringify(store))}catch(e){}};
@@ -482,11 +488,11 @@ function render(){
     const wknd=r.w===5||r.w===6,wi=wknd?wm[r.wk]:-1,first=wknd&amp;&amp;!rs.some(q=&gt;q!==r&amp;&amp;q.wk===r.wk&amp;&amp;q.iso&lt;r.iso&amp;&amp;(q.w===5||q.w===6));
     const cls=wknd?&quot;wk&quot;+(first?&quot; f&quot;:&quot;&quot;):&quot;hol&quot;,sty=wknd?` style=&quot;--h:${HUES[wi%HUES.length]}&quot;`:&quot;&quot;;
     const type=(r.h?`&lt;span class=&quot;hn&quot;&gt;${r.h}&lt;/span&gt;`:&quot;&quot;)+(r.h&amp;&amp;store.custom[r.iso]?` &lt;button class=&quot;x&quot; data-rm=&quot;${r.iso}&quot; title=&quot;Remove&quot;&gt;✕&lt;/button&gt;`:&quot;&quot;)||&quot;Weekend&quot;;
-    const sels=[0,1,2].map(i=&gt;`&lt;td&gt;&lt;select data-d=&quot;${r.iso}&quot; data-i=&quot;${i}&quot;&gt;&lt;option value=&quot;&quot;&gt;—&lt;/option&gt;${all.map(x=&gt;`&lt;option${x===r.a[i]?&quot; selected&quot;:&quot;&quot;}${r.a.includes(x)&amp;&amp;x!==r.a[i]?&quot; disabled&quot;:&quot;&quot;}&gt;${x}&lt;/option&gt;`).join(&quot;&quot;)}&lt;/select&gt;&lt;/td&gt;`).join(&quot;&quot;);
+    const sels=[0,1,2].map(i=&gt;`&lt;td${r.a[i]?` class=&quot;pk&quot; style=&quot;--h:${hue(r.a[i])}&quot;`:&quot;&quot;}&gt;&lt;select data-d=&quot;${r.iso}&quot; data-i=&quot;${i}&quot;&gt;&lt;option value=&quot;&quot;&gt;—&lt;/option&gt;${all.map(x=&gt;`&lt;option${x===r.a[i]?&quot; selected&quot;:&quot;&quot;}${r.a.includes(x)&amp;&amp;x!==r.a[i]?&quot; disabled&quot;:&quot;&quot;}&gt;${x}&lt;/option&gt;`).join(&quot;&quot;)}&lt;/select&gt;&lt;/td&gt;`).join(&quot;&quot;);
     html+=`&lt;tr class=&quot;${cls}&quot;${sty}&gt;&lt;td class=&quot;c&quot;&gt;&lt;b&gt;${r.d} ${MON[r.mo-1].slice(0,3)} ${r.y}&lt;/b&gt;&lt;/td&gt;&lt;td class=&quot;c&quot;&gt;${DAYS[r.w]}${wknd?`&lt;span class=&quot;tag&quot;&gt;Week ${wi+1}&lt;/span&gt;`:&quot;&quot;}&lt;/td&gt;&lt;td class=&quot;h&quot;&gt;${type}&lt;/td&gt;${sels}&lt;/tr&gt;`;
   });
   $(&quot;body&quot;).innerHTML=html||&#x27;&lt;tr&gt;&lt;td colspan=&quot;6&quot; class=&quot;e&quot;&gt;No holidays this month&lt;/td&gt;&lt;/tr&gt;&#x27;;
-  const NH=[150,210,270,330,25,185,50,0];$(&quot;sum&quot;).innerHTML=all.map((x,i)=&gt;`&lt;div style=&quot;--h:${NH[i%NH.length]}&quot;&gt;${x}&lt;b&gt;${cnt[x]} day${cnt[x]===1?&quot;&quot;:&quot;s&quot;}&lt;/b&gt;&lt;/div&gt;`).join(&quot;&quot;);
+  $(&quot;sum&quot;).innerHTML=all.map((x,i)=&gt;`&lt;div style=&quot;--h:${NH[i%NH.length]}&quot;&gt;${x}&lt;b&gt;${cnt[x]} day${cnt[x]===1?&quot;&quot;:&quot;s&quot;}&lt;/b&gt;&lt;/div&gt;`).join(&quot;&quot;);
   if($(&quot;rep&quot;).style.display===&quot;block&quot;) report();
 }
 const fmt=r=&gt;`${r.d} ${MON[r.mo-1].slice(0,3)} ${r.y}`;
@@ -497,7 +503,7 @@ function report(){
   const rs=rows(),L=&quot;ABCDEF&quot;;
   let h=&quot;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&quot;+[...L].map(c=&gt;&quot;&lt;th&gt;&quot;+c+&quot;&lt;/th&gt;&quot;).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;;
   h+=&#x27;&lt;tr class=&quot;hd&quot;&gt;&lt;td class=&quot;rn&quot;&gt;1&lt;/td&gt;&#x27;+[&quot;Date&quot;,&quot;Day&quot;,&quot;Holiday&quot;,&quot;Engineer 1&quot;,&quot;Engineer 2&quot;,&quot;Engineer 3&quot;].map(x=&gt;&quot;&lt;td&gt;&quot;+x+&quot;&lt;/td&gt;&quot;).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;;
-  rs.forEach((r,i)=&gt;{h+=&#x27;&lt;tr&gt;&lt;td class=&quot;rn&quot;&gt;&#x27;+(i+2)+&quot;&lt;/td&gt;&quot;+[fmt(r),DAYS[r.w],r.h||&quot;Weekend&quot;,...r.a].map((x,j)=&gt;&quot;&lt;td&quot;+(j&gt;2?&#x27; class=&quot;en&quot;&#x27;:&quot;&quot;)+&quot;&gt;&quot;+x+&quot;&lt;/td&gt;&quot;).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;});
+  rs.forEach((r,i)=&gt;{h+=&#x27;&lt;tr&gt;&lt;td class=&quot;rn&quot;&gt;&#x27;+(i+2)+&quot;&lt;/td&gt;&quot;+[fmt(r),DAYS[r.w],r.h||&quot;Weekend&quot;,...r.a].map((x,j)=&gt;&quot;&lt;td&quot;+(j&gt;2?(&#x27; class=&quot;en&quot;&#x27;+(x?&#x27; style=&quot;--h:&#x27;+hue(x)+&#x27;&quot;&#x27;:&quot;&quot;)):&quot;&quot;)+&quot;&gt;&quot;+x+&quot;&lt;/td&gt;&quot;).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;});
   $(&quot;rt&quot;).innerHTML=h;
 }
 function copy(text){
