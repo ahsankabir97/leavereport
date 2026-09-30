@@ -766,7 +766,7 @@ const G=[
 const C=[];G.forEach((g,gi)=&gt;g.d.forEach((v,i)=&gt;C.push({gi,i,g:g.g,s:g.s,t:g.t,d:v,first:i===0})));
 // display order: Logical Night (group 11) sits right after Physical Night (group 5); storage order is unchanged
 const ORD=[0,1,2,3,4,5,11,6,7,8,9,10],CO=[];ORD.forEach(g=&gt;C.forEach((c,ci)=&gt;{if(c.gi===g)CO.push(ci)}));
-const TT=&quot;T-30|RONE|Rabinur|Rakib - H;T-31|IBRAHIM|RATUL|Apon - H;T-32|RAJU|Alal|Hasib - H;T-33|MILON KHAN|SUJON|Ujjol - H;T-34|NAZMUL|Taimur|Nurhan - H;T-35|MARUF|Alamin|Asib Kawsar;T-36|Abdul Latif||New Helper&quot;.split(&quot;;&quot;).map(r=&gt;r.split(&quot;|&quot;));
+const TT=&quot;T-30|RONE|Rabinur|Rakib - H;T-31|IBRAHIM|RATUL|Apon - H;T-32|RAJU|Alal|Hasib - H;T-33|MILON KHAN|SUJON|Ujjol - H;T-34|NAZMUL|Taimur|Nurhan - H;T-35|MARUF|Alamin|Asib Kawsar;T-36|Abdul Latif||New Helper;|||;|||&quot;.split(&quot;;&quot;).map(r=&gt;r.split(&quot;|&quot;));
 const NT=&quot;N-1|Ebrahim (Uttara)|Jafor|Hanif;N-2|Bacchu|Mamun Khan (Banasree)|Al-Amin (Motijheel);N-3|Sukon (Mirpur)|Didarul Islam|Rubel Jr.;N-4|Anower (Mirpur)|Timur (Motijheel)|Jashim-353 (Uttara);N-5|Nazmul (Motijheel)|Anis|Bijoy;N-6|Aminul (Mirpur)|Shopon|Rabinur (Motijheel);N-7|Amir|Kalam (Banasree)|Nazrul;N-8|Monir-355 (Uttara)|Latif (Motijheel)|Ratan;N-9|Rahmat|Nuru|Uzzal (Uttara);N-10|Milon (Motijheel)|Mukul|Arfan (Mirpur);N-11|Rahman|Rabiul|Billal (Banasree);N-12|Emran|Imran Jr. (Uttara)|Hossain;N-13|Anis|MD. Alal (Motijheel)|Masum;N-14|Ibrahim (Motijheel)|MD. Mamun Mia (Uttara)|MD. Asadul Islam (Mirpur);N-15|Nurul|Ziaul (Uttara)|Zakir;N-16|Anwor (Mirpur)|Sabbir Fakir (Banasree)|Rabinur (Motijheel)&quot;.split(&quot;;&quot;).map(r=&gt;r.split(&quot;|&quot;));
 let S={days:{},teams:{tt:TT,nt:NT}};
 try{const s=localStorage.getItem(&quot;sched-v1&quot;);if(s)S=Object.assign(S,JSON.parse(s))}catch(e){}
@@ -976,7 +976,7 @@ const sapply=m=&gt;{const days={};
  Object.keys(m).forEach(k=&gt;{if(k.indexOf(&quot;days/&quot;)===0){try{days[k.slice(5)]=JSON.parse(m[k])}catch(e){}}});
  S.days=days;
  {const mv={};Object.keys(m).forEach(k=&gt;{if(k.indexOf(&quot;mv/&quot;)===0){try{mv[k.slice(3)]=JSON.parse(m[k])}catch(e){}}});S.mv=mv}
- try{if(m.teams)S.teams=JSON.parse(m.teams)}catch(e){}
+ try{if(m.teams)S.teams=JSON.parse(m.teams)}catch(e){}try{while(S.teams.tt.length&lt;9)S.teams.tt.push([&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;])}catch(e){}
  try{if(m.list){S.list=JSON.parse(m.list);setDL()}}catch(e){}
  if(typeof m.notes===&quot;string&quot;){S.notes=m.notes;if(document.activeElement!==noteEl&amp;&amp;noteEl.innerHTML!==m.notes)noteEl.innerHTML=m.notes}
  try{localStorage.setItem(&quot;sched-v1&quot;,JSON.stringify(S))}catch(e){}
