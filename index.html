@@ -714,6 +714,26 @@ td.tt{background:#ece8ff}td.tt input{font-weight:800;color:#3b2f99}
 .tb table td input{width:100%;min-width:0;text-align:center;padding:0 6px}
 .tb th{padding:4px 6px}
 .tb th{position:static}
+
+/* Notes box */
+.nb{margin-top:14px;border:1px solid #cfd3cc;border-radius:8px;background:#fff;overflow:hidden}
+.nbt{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:5px 8px;background:#f3f7f4;border-bottom:1px solid #e1e6e0;font-size:12px}
+.nbt b{margin-right:4px;font-size:13px}
+.nbt button{font:inherit;font-size:12px;padding:2px 8px;border:1px solid #c5ccc4;background:#fff;border-radius:5px;cursor:pointer}
+.nbt button:hover{background:#e7f3ec}
+.nbt .tbo{display:none;gap:4px}
+.nb.intb .tbo{display:inline-flex}
+#note{min-height:90px;padding:8px 10px;outline:none;font-size:13.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+#note:empty::before{content:attr(data-ph);color:#9aa59d}
+#note table{border-collapse:collapse;margin:6px 0;white-space:normal}
+#note td{border:1px solid #b9c2ba;padding:4px 8px;min-width:70px;height:26px}
+#note td.sel{background:#eef7f1}
+
+/* Holiday + weekly-holiday rows: original peach, names = deeper same colour + black outline + white text */
+tr.we td.f,tr.gh td.f{background:hsl(var(--h) 60% 40%);outline:1.5px solid #000;outline-offset:-1.5px}
+tr.we td.tt,tr.gh td.tt{background:#6552c9;outline:1.5px solid #000;outline-offset:-1.5px}
+tr.we td.o,tr.gh td.o{outline:1.5px solid #000;outline-offset:-1.5px}
+tr.we td.f input,tr.we td.tt input,tr.we td.o input,tr.gh td.f input,tr.gh td.tt input,tr.gh td.o input{color:#fff;font-weight:800;text-shadow:0 0 2px rgba(0,0,0,.45)}
 &lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;w&quot;&gt;
 &lt;div class=&quot;bar&quot;&gt;&lt;button id=&quot;menu&quot; title=&quot;Show / hide navigation&quot;&gt;☰ Menu&lt;/button&gt;&lt;h1&gt;Duty Schedule&lt;/h1&gt;
 &lt;button id=&quot;prev&quot;&gt;‹&lt;/button&gt;&lt;input type=&quot;month&quot; id=&quot;m&quot;&gt;&lt;button id=&quot;next&quot;&gt;›&lt;/button&gt;
@@ -721,7 +741,9 @@ td.tt{background:#ece8ff}td.tt input{font-weight:800;color:#3b2f99}
 &lt;button id=&quot;cp&quot;&gt;Copy for Excel&lt;/button&gt;&lt;button id=&quot;csv&quot;&gt;Download CSV&lt;/button&gt;&lt;span class=&quot;ok&quot; id=&quot;ok&quot;&gt;&lt;/span&gt;&lt;span id=&quot;cloud&quot; style=&quot;font-size:12px;font-weight:600&quot;&gt;&lt;/span&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sc&quot;&gt;&lt;table id=&quot;t&quot;&gt;&lt;/table&gt;&lt;/div&gt;
-&lt;div class=&quot;two&quot;&gt;&lt;div&gt;&lt;h2&gt;Technician Teams&lt;/h2&gt;&lt;div class=&quot;tb&quot;&gt;&lt;table id=&quot;tt&quot;&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;two&quot;&gt;&lt;div&gt;&lt;h2&gt;Technician Teams&lt;/h2&gt;&lt;div class=&quot;tb&quot;&gt;&lt;table id=&quot;tt&quot;&gt;&lt;/table&gt;&lt;/div&gt;
+&lt;div class=&quot;nb&quot; id=&quot;nb&quot;&gt;&lt;div class=&quot;nbt&quot;&gt;&lt;b&gt;Notes&lt;/b&gt;&lt;button id=&quot;ntbl&quot;&gt;▦ Insert Table&lt;/button&gt;&lt;span class=&quot;tbo&quot;&gt;&lt;button id=&quot;nar&quot;&gt;+ Row&lt;/button&gt;&lt;button id=&quot;nac&quot;&gt;+ Col&lt;/button&gt;&lt;button id=&quot;ndr&quot;&gt;− Row&lt;/button&gt;&lt;button id=&quot;ndc&quot;&gt;− Col&lt;/button&gt;&lt;button id=&quot;ndt&quot;&gt;Delete Table&lt;/button&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div id=&quot;note&quot; contenteditable=&quot;true&quot; spellcheck=&quot;false&quot; data-ph=&quot;Ekhane jei kono kichu likhte paren...&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;div&gt;&lt;h2&gt;Night Teams&lt;/h2&gt;&lt;div class=&quot;tb&quot;&gt;&lt;table id=&quot;nt&quot;&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;datalist id=&quot;dl-e&quot;&gt;&lt;/datalist&gt;&lt;datalist id=&quot;dl-t&quot;&gt;&lt;/datalist&gt;
 &lt;/div&gt;
@@ -916,7 +938,35 @@ function cloudSync(path,getMap,applyMap){
  return {push};
 }
 
-const smap=()=&gt;{const m={};Object.keys(S.days).forEach(k=&gt;{m[&quot;days/&quot;+k]=JSON.stringify(S.days[k])});Object.keys(S.mv||{}).forEach(k=&gt;{m[&quot;mv/&quot;+k]=JSON.stringify(S.mv[k])});m.teams=JSON.stringify(S.teams);m.list=JSON.stringify(S.list);return m};
+
+/* ===== Notes box (free text + optional tables, auto-fit, cloud synced) ===== */
+const noteEl=$(&quot;note&quot;),nb=$(&quot;nb&quot;);
+noteEl.innerHTML=S.notes||&quot;&quot;;
+let noteT=null;
+const saveNote=()=&gt;{clearTimeout(noteT);noteT=setTimeout(()=&gt;{S.notes=noteEl.innerHTML.replace(/^(&lt;br&gt;)+$/,&quot;&quot;);save()},400)};
+noteEl.addEventListener(&quot;input&quot;,saveNote);
+noteEl.addEventListener(&quot;paste&quot;,e=&gt;{e.preventDefault();const t=(e.clipboardData||window.clipboardData).getData(&quot;text/plain&quot;);document.execCommand(&quot;insertText&quot;,false,t)});
+const curCell=()=&gt;{const n=getSelection().anchorNode;const el=n&amp;&amp;(n.nodeType===1?n:n.parentElement);return el&amp;&amp;noteEl.contains(el)?el.closest(&quot;td&quot;):null};
+document.addEventListener(&quot;selectionchange&quot;,()=&gt;nb.classList.toggle(&quot;intb&quot;,!!curCell()));
+noteEl.addEventListener(&quot;keydown&quot;,e=&gt;{
+ if(e.key===&quot;Tab&quot;){const c=curCell();if(!c)return;e.preventDefault();
+  const cells=[...c.closest(&quot;table&quot;).querySelectorAll(&quot;td&quot;)],i=cells.indexOf(c),n=cells[e.shiftKey?i-1:i+1];
+  if(n){const r=document.createRange();r.selectNodeContents(n);r.collapse(false);const s=getSelection();s.removeAllRanges();s.addRange(r)}}
+});
+$(&quot;ntbl&quot;).onclick=()=&gt;{
+ const r=parseInt(prompt(&quot;Koyta row?&quot;,&quot;3&quot;)||&quot;&quot;,10),c=parseInt(prompt(&quot;Koyta column?&quot;,&quot;3&quot;)||&quot;&quot;,10);
+ if(!(r&gt;0&amp;&amp;c&gt;0))return;
+ const tb=&quot;&lt;table&gt;&quot;+(&quot;&lt;tr&gt;&quot;+&quot;&lt;td&gt;&lt;br&gt;&lt;/td&gt;&quot;.repeat(Math.min(c,20))+&quot;&lt;/tr&gt;&quot;).repeat(Math.min(r,50))+&quot;&lt;/table&gt;&lt;br&gt;&quot;;
+ noteEl.focus();document.execCommand(&quot;insertHTML&quot;,false,tb);saveNote()};
+const withCell=f=&gt;{const c=curCell();if(!c)return;f(c,c.closest(&quot;table&quot;),c.parentElement);saveNote()};
+$(&quot;nar&quot;).onclick=()=&gt;withCell((c,t,r)=&gt;{const n=r.cloneNode(true);n.querySelectorAll(&quot;td&quot;).forEach(x=&gt;x.innerHTML=&quot;&lt;br&gt;&quot;);r.after(n)});
+$(&quot;nac&quot;).onclick=()=&gt;withCell((c,t,r)=&gt;{const i=[...r.children].indexOf(c);t.querySelectorAll(&quot;tr&quot;).forEach(tr=&gt;{const td=document.createElement(&quot;td&quot;);td.innerHTML=&quot;&lt;br&gt;&quot;;tr.children[i].after(td)})});
+$(&quot;ndr&quot;).onclick=()=&gt;withCell((c,t,r)=&gt;{if(t.rows.length&lt;=1)t.remove();else r.remove()});
+$(&quot;ndc&quot;).onclick=()=&gt;withCell((c,t,r)=&gt;{const i=[...r.children].indexOf(c);if(r.children.length&lt;=1){t.remove();return}t.querySelectorAll(&quot;tr&quot;).forEach(tr=&gt;tr.children[i]&amp;&amp;tr.children[i].remove())});
+$(&quot;ndt&quot;).onclick=()=&gt;withCell((c,t)=&gt;t.remove());
+// keep toolbar buttons from stealing the text cursor
+nb.querySelector(&quot;.nbt&quot;).addEventListener(&quot;mousedown&quot;,e=&gt;{if(e.target.tagName===&quot;BUTTON&quot;)e.preventDefault()});
+const smap=()=&gt;{const m={};Object.keys(S.days).forEach(k=&gt;{m[&quot;days/&quot;+k]=JSON.stringify(S.days[k])});Object.keys(S.mv||{}).forEach(k=&gt;{m[&quot;mv/&quot;+k]=JSON.stringify(S.mv[k])});m.teams=JSON.stringify(S.teams);m.list=JSON.stringify(S.list);m.notes=S.notes||&quot;&quot;;return m};
 let needR=false;document.addEventListener(&quot;focusout&quot;,()=&gt;{if(needR){needR=false;setTimeout(render,80)}});
 const sapply=m=&gt;{const days={};
  Object.keys(m).forEach(k=&gt;{if(k.indexOf(&quot;days/&quot;)===0){try{days[k.slice(5)]=JSON.parse(m[k])}catch(e){}}});
@@ -924,6 +974,7 @@ const sapply=m=&gt;{const days={};
  {const mv={};Object.keys(m).forEach(k=&gt;{if(k.indexOf(&quot;mv/&quot;)===0){try{mv[k.slice(3)]=JSON.parse(m[k])}catch(e){}}});S.mv=mv}
  try{if(m.teams)S.teams=JSON.parse(m.teams)}catch(e){}
  try{if(m.list){S.list=JSON.parse(m.list);setDL()}}catch(e){}
+ if(typeof m.notes===&quot;string&quot;){S.notes=m.notes;if(document.activeElement!==noteEl&amp;&amp;noteEl.innerHTML!==m.notes)noteEl.innerHTML=m.notes}
  try{localStorage.setItem(&quot;sched-v1&quot;,JSON.stringify(S))}catch(e){}
  const a=document.activeElement;
  if(a&amp;&amp;a.closest&amp;&amp;a.closest(&quot;#t&quot;)&amp;&amp;/INPUT|SELECT/.test(a.tagName))needR=true;else render()};
