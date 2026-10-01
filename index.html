@@ -1,5 +1,5 @@
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8IS0tIEJhY2tncm91bmQgLS0+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTIiIGZpbGw9IiMwZDliNjAiLz4KICA8IS0tIFBlcnNvbi9FbXBsb3llZSBpY29uIC0tPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMjIiIHI9IjEwIiBmaWxsPSJ3aGl0ZSIvPgogIDwhLS0gQm9keSAtLT4KICA8cGF0aCBkPSJNMTQgNTIgQzE0IDM4IDUwIDM4IDUwIDUyIiBmaWxsPSJ3aGl0ZSIvPgogIDwhLS0gQnJpZWZjYXNlL0lEIGJhZGdlIGRldGFpbCAtLT4KICA8cmVjdCB4PSIyNyIgeT0iMjgiIHdpZHRoPSIxMCIgaGVpZ2h0PSI3IiByeD0iMiIgZmlsbD0iIzBkOWI2MCIvPgogIDxyZWN0IHg9IjI5IiB5PSIyNiIgd2lkdGg9IjYiIGhlaWdodD0iMyIgcng9IjEiIGZpbGw9IiMwZDliNjAiLz4KPC9zdmc+Cg==">
-<title>Link3 Leave Management</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzBiM2EyZiIvPgogIDxyZWN0IHg9IjEwIiB5PSIxNCIgd2lkdGg9IjQ0IiBoZWlnaHQ9IjQwIiByeD0iNiIgZmlsbD0iI2ZmZmZmZiIvPgogIDxyZWN0IHg9IjEwIiB5PSIxNCIgd2lkdGg9IjQ0IiBoZWlnaHQ9IjEyIiByeD0iNiIgZmlsbD0iIzBkOWI2MCIvPgogIDxyZWN0IHg9IjEwIiB5PSIyMCIgd2lkdGg9IjQ0IiBoZWlnaHQ9IjYiIGZpbGw9IiMwZDliNjAiLz4KICA8cmVjdCB4PSIxOSIgeT0iOCIgd2lkdGg9IjUiIGhlaWdodD0iMTEiIHJ4PSIyLjUiIGZpbGw9IiNmZmZmZmYiLz4KICA8cmVjdCB4PSI0MCIgeT0iOCIgd2lkdGg9IjUiIGhlaWdodD0iMTEiIHJ4PSIyLjUiIGZpbGw9IiNmZmZmZmYiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iIzBiM2EyZiI+TDM8L3RleHQ+Cjwvc3ZnPg==">
+<title>Link3 Motijheel Leave Management</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Roboto+Serif:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -565,11 +565,16 @@ function syncToSchedule(){
     return &quot;Duty Schedule updated ✓ (&quot;+n+&quot; day&quot;+(n===1?&quot;&quot;:&quot;s&quot;)+&quot;)&quot;;
   }catch(e){return &quot;Could not update Duty Schedule&quot;}
 }
+function syncDay(iso){ // auto: push just the changed date to the Monthly Schedule
+  try{const fr=parent.document.getElementById(&quot;schedule-frame&quot;);
+   fr.contentWindow.postMessage({t:&quot;roster-sync&quot;,one:true,a:{[iso]:(store.assign[iso]||[&quot;&quot;,&quot;&quot;,&quot;&quot;]).slice()}},&quot;*&quot;);
+   const m=&quot;Duty Schedule auto updated ✓&quot;;$(&quot;ok&quot;).textContent=m;setTimeout(()=&gt;{if($(&quot;ok&quot;).textContent===m)$(&quot;ok&quot;).textContent=&quot;&quot;},2500)}
+  catch(e){$(&quot;ok&quot;).textContent=&quot;Could not update Duty Schedule&quot;}}
 $(&quot;gen&quot;).onclick=()=&gt;{const m=syncToSchedule();
   if(m){$(&quot;ok&quot;).textContent=m;setTimeout(()=&gt;{if($(&quot;ok&quot;).textContent===m)$(&quot;ok&quot;).textContent=&quot;&quot;},4000)}};
 $(&quot;body&quot;).onchange=e=&gt;{const t=e.target,d=t.dataset.d;if(!d)return;
   const a=(store.assign[d]||[&quot;&quot;,&quot;&quot;,&quot;&quot;]).slice();a[+t.dataset.i]=t.value;
-  if(a.every(x=&gt;!x))delete store.assign[d];else store.assign[d]=a;save();render()};
+  if(a.every(x=&gt;!x))delete store.assign[d];else store.assign[d]=a;save();render();syncDay(d)};
 $(&quot;body&quot;).addEventListener(&quot;keydown&quot;,e=&gt;{
   const t=e.target;
   if(t.tagName!==&quot;SELECT&quot;||!t.dataset.d)return;
@@ -680,9 +685,18 @@ button:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,0,0,.14)}
 #fill{background:linear-gradient(135deg,#10b981,#0d9488);color:#fff;border-color:#0d9488}
 #an{background:#f3e8ff;border-color:#d8b4fe;color:#6b21a8}#rn{background:#ffedd5;border-color:#fdba74;color:#9a3412}
 #clr{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
-#cp{background:#2563eb;border-color:#2563eb;color:#fff}
 #csv{background:#ea580c;border-color:#ea580c;color:#fff}
 #xl{background:#16a34a;border-color:#16a34a;color:#fff}
+#shot{background:#0284c7;border-color:#0284c7;color:#fff}
+/* regular working days: name cells transparent + navy blue names (weekly/govt holiday rows keep their colours) */
+tr:not(.we):not(.gh) td.f,tr:not(.we):not(.gh) td.tt{background:transparent}
+tr:not(.we):not(.gh) td.f input,tr:not(.we):not(.gh) td.tt input{color:#0b2a7a}
+td input[readonly]{cursor:pointer;caret-color:transparent;-webkit-user-select:none;user-select:none}
+#pick{position:fixed;z-index:9999;display:flex;flex-wrap:wrap;gap:6px;max-width:min(560px,calc(100vw - 12px));max-height:60vh;overflow:auto;padding:8px;background:#fff;border:1px solid #9fb0a8;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.22)}
+#pick button{border:1.5px solid #5f7f72;border-radius:6px;background:#fff;color:#1f2421;font-size:12px;font-weight:700;padding:4px 12px;white-space:nowrap}
+#pick button.h{background:hsl(var(--h) 80% 88%);color:hsl(var(--h) 65% 20%)}
+#pick button.on{outline:2px solid #0d9b60;outline-offset:1px}
+#pick button.x{border-color:#fca5a5;background:#fee2e2;color:#991b1b}
 .ok{color:#0d9b60;font-weight:600}
 .sc{overflow:auto;max-height:calc(100vh - 46px);border:1px solid #cfd3cc;border-radius:8px;background:#fff}
 table{border-collapse:separate;border-spacing:0;font-size:11px;text-align:center}
@@ -697,6 +711,9 @@ tr.we td:not(.f):not(.tt):not(.o){background:#fcd5bd}
 tr.gh td.d{background:#fcd5bd;color:#9a3412}
 tr.gh td:not(.f):not(.tt):not(.o){background:#fcd5bd}
 td.o{background:#ea580c}td.o input{font-weight:800;color:#fff}
+td.comp,tr.we td.comp,tr.gh td.comp{background:#dc2626 !important}
+td.comp input,tr.we td.comp input,tr.gh td.comp input{font-weight:800;color:#fff;text-shadow:none}
+tr.we td.comp,tr.gh td.comp{outline:1.5px solid #000;outline-offset:-1.5px}
 td input::-webkit-calendar-picker-indicator{display:none !important;opacity:0}
 td input{text-align:center !important;text-overflow:clip}
 #t{table-layout:fixed}
@@ -712,7 +729,13 @@ td.f{background:hsl(var(--h) 80% 82%)}td.f input{font-weight:800;color:hsl(var(-
 td.tt{background:#ece8ff}td.tt input{font-weight:800;color:#3b2f99}
 .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
 .tb{overflow:auto;border:1px solid #cfd3cc;border-radius:8px;background:#fff}
-.tb table td input{width:100%;min-width:0;text-align:center;padding:0 6px}
+.tb table td input{width:100%;min-width:0;text-align:center;padding:0 6px;font-weight:700}
+.xtb{margin-top:12px}
+.xtbar{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:4px}
+.xtbar b{margin-right:4px;font-size:13px}
+.xtbar button{font-size:12px;padding:2px 8px;border:1px solid #c5ccc4;background:#fff;border-radius:5px;cursor:pointer}
+.xtbar button:hover{background:#e7f3ec}
+.xtbar button.del{border-color:#fca5a5;background:#fee2e2;color:#991b1b}
 .tb th{padding:4px 6px}
 .tb th{position:static}
 
@@ -731,20 +754,22 @@ td.tt{background:#ece8ff}td.tt input{font-weight:800;color:#3b2f99}
 #note td.sel{background:#eef7f1}
 
 /* Holiday + weekly-holiday rows: original peach, names = deeper same colour + black outline + white text */
-tr.we td.f,tr.gh td.f{background:hsl(var(--h) 60% 40%);outline:1.5px solid #000;outline-offset:-1.5px}
+tr.we td.f,tr.gh td.f{background:#fcd5bd}
 tr.we td.tt,tr.gh td.tt{background:#6552c9;outline:1.5px solid #000;outline-offset:-1.5px}
 tr.we td.o,tr.gh td.o{outline:1.5px solid #000;outline-offset:-1.5px}
 tr.we td.f input,tr.we td.tt input,tr.we td.o input,tr.gh td.f input,tr.gh td.tt input,tr.gh td.o input{color:#fff;font-weight:800;text-shadow:0 0 2px rgba(0,0,0,.45)}
+/* holiday rows: engineer name = deep orange-brown text (same family as the date label) on the row colour */
+tr.we td.f input,tr.gh td.f input{color:#541604;font-weight:800;text-shadow:none}
 &lt;/style&gt;&lt;script src=&quot;https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js&quot;&gt;&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;w&quot;&gt;
 &lt;div class=&quot;bar&quot;&gt;&lt;button id=&quot;menu&quot; title=&quot;Show / hide navigation&quot;&gt;☰ Menu&lt;/button&gt;&lt;h1&gt;Duty Schedule&lt;/h1&gt;
 &lt;button id=&quot;prev&quot;&gt;‹&lt;/button&gt;&lt;input type=&quot;month&quot; id=&quot;m&quot;&gt;&lt;button id=&quot;next&quot;&gt;›&lt;/button&gt;
-&lt;button id=&quot;fill&quot;&gt;Fill Defaults&lt;/button&gt;&lt;button id=&quot;an&quot;&gt;+ Add Name&lt;/button&gt;&lt;button id=&quot;rn&quot;&gt;− Remove Name&lt;/button&gt;&lt;button id=&quot;clr&quot;&gt;Clear Month&lt;/button&gt;
-&lt;button id=&quot;cp&quot;&gt;Copy for Excel&lt;/button&gt;&lt;button id=&quot;xl&quot;&gt;Download Excel (.xlsx)&lt;/button&gt;&lt;span class=&quot;ok&quot; id=&quot;ok&quot;&gt;&lt;/span&gt;&lt;span id=&quot;cloud&quot; style=&quot;font-size:12px;font-weight:600&quot;&gt;&lt;/span&gt;
+&lt;button id=&quot;fill&quot;&gt;Fill Defaults&lt;/button&gt;&lt;button id=&quot;an&quot;&gt;+ Add Name&lt;/button&gt;&lt;button id=&quot;rn&quot;&gt;− Remove Name&lt;/button&gt;&lt;button id=&quot;clr&quot;&gt;Clear Month&lt;/button&gt;&lt;button id=&quot;shot&quot; title=&quot;Date theke Compensatory column porjonto pura mash er screenshot (PNG)&quot;&gt;📷 Screenshot&lt;/button&gt;
+&lt;button id=&quot;xl&quot;&gt;Download Excel (.xlsx)&lt;/button&gt;&lt;span class=&quot;ok&quot; id=&quot;ok&quot;&gt;&lt;/span&gt;&lt;span id=&quot;cloud&quot; style=&quot;font-size:12px;font-weight:600&quot;&gt;&lt;/span&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sc&quot;&gt;&lt;table id=&quot;t&quot;&gt;&lt;/table&gt;&lt;/div&gt;
 &lt;div class=&quot;two&quot;&gt;&lt;div&gt;&lt;h2&gt;Technician Teams&lt;/h2&gt;&lt;div class=&quot;tb&quot;&gt;&lt;table id=&quot;tt&quot;&gt;&lt;/table&gt;&lt;/div&gt;
 &lt;div class=&quot;nb&quot; id=&quot;nb&quot;&gt;&lt;div class=&quot;nbt&quot;&gt;&lt;b&gt;Notes&lt;/b&gt;&lt;button id=&quot;ntbl&quot;&gt;▦ Insert Table&lt;/button&gt;&lt;span class=&quot;tbo&quot;&gt;&lt;button id=&quot;nar&quot;&gt;+ Row&lt;/button&gt;&lt;button id=&quot;nac&quot;&gt;+ Col&lt;/button&gt;&lt;button id=&quot;ndr&quot;&gt;− Row&lt;/button&gt;&lt;button id=&quot;ndc&quot;&gt;− Col&lt;/button&gt;&lt;button id=&quot;ndt&quot;&gt;Delete Table&lt;/button&gt;&lt;/span&gt;&lt;/div&gt;
-&lt;div id=&quot;note&quot; contenteditable=&quot;true&quot; spellcheck=&quot;false&quot; data-ph=&quot;Ekhane jei kono kichu likhte paren...&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div id=&quot;note&quot; contenteditable=&quot;true&quot; spellcheck=&quot;false&quot; data-ph=&quot;Ekhane jei kono kichu likhte paren...&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id=&quot;xts&quot;&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;div&gt;&lt;h2&gt;Night Teams&lt;/h2&gt;&lt;div class=&quot;tb&quot;&gt;&lt;table id=&quot;nt&quot;&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;datalist id=&quot;dl-e&quot;&gt;&lt;/datalist&gt;&lt;datalist id=&quot;dl-t&quot;&gt;&lt;/datalist&gt;
 &lt;/div&gt;
@@ -786,6 +811,7 @@ document.addEventListener(&quot;change&quot;,e=&gt;{const t=e.target;if(!t.datas
  if(C[+t.dataset.c].t===&quot;z&quot;)return;
  const v=t.value.trim().toUpperCase();
  const tc=C[+t.dataset.c],isNC=tc.s===&quot;E&quot;&amp;&amp;(tc.gi===5||tc.gi===6);
+ if(v&amp;&amp;restViolation(t.dataset.k,+t.dataset.c,v)){t.value=t.dataset.pv||&quot;&quot;;return}
  if(isNC){const mv=S.mv=S.mv||{},iso=t.dataset.k,ci=t.dataset.c,rec=mv[iso]&amp;&amp;mv[iso][ci];
   if(rec&amp;&amp;rec.n!==v){const tr=t.closest(&quot;tr&quot;); // name removed/changed: put the old name back where it was
    rec.c.forEach(p=&gt;{const o=tr.querySelector(&#x27;[data-c=&quot;&#x27;+p[0]+&#x27;&quot;]&#x27;);
@@ -817,6 +843,28 @@ document.addEventListener(&quot;keydown&quot;,e=&gt;{const t=e.target;
  t.dispatchEvent(new Event(&quot;input&quot;,{bubbles:true}));
  t.dispatchEvent(new Event(&quot;change&quot;,{bubbles:true}));
 });
+/* Double-click name picker: names side by side, each in its own bordered box */
+(()=&gt;{let box=null,cur=null,openT=0;
+ const close=()=&gt;{if(box){box.remove();box=null;cur=null}};
+ const opts=inp=&gt;C[+inp.dataset.c].s===&quot;T&quot;?T.concat(Array.from({length:16},(_,i)=&gt;&quot;N-&quot;+(i+1))):S.list.slice();
+ const choose=n=&gt;{const inp=cur;close();if(!inp)return;inp.focus();inp.value=n;
+  inp.dispatchEvent(new Event(&quot;input&quot;,{bubbles:true}));inp.dispatchEvent(new Event(&quot;change&quot;,{bubbles:true}))};
+ document.addEventListener(&quot;dblclick&quot;,e=&gt;{const inp=e.target;
+  if(!inp||inp.tagName!==&quot;INPUT&quot;||!inp.dataset||inp.dataset.k===undefined||C[+inp.dataset.c].t===&quot;z&quot;)return;
+  close();cur=inp;box=document.createElement(&quot;div&quot;);box.id=&quot;pick&quot;;
+  const isE=C[+inp.dataset.c].s===&quot;E&quot;,cv=inp.value.trim().toUpperCase();
+  const add=(label,val,cls)=&gt;{const b=document.createElement(&quot;button&quot;);b.type=&quot;button&quot;;b.textContent=label;
+   if(cls)b.className=cls;b.onmousedown=ev=&gt;ev.preventDefault();b.onclick=()=&gt;choose(val);box.appendChild(b);return b};
+  opts(inp).forEach(n=&gt;{const b=add(n,n,isE?&quot;h&quot;:&quot;&quot;);if(isE)b.style.setProperty(&quot;--h&quot;,hue(n));if(n.toUpperCase()===cv)b.classList.add(&quot;on&quot;)});
+  if(cv)add(&quot;✕ Clear&quot;,&quot;&quot;,&quot;x&quot;);
+  document.body.appendChild(box);
+  const r=inp.parentElement.getBoundingClientRect(),bw=box.offsetWidth,bh=box.offsetHeight;
+  let x=Math.min(Math.max(4,r.left),innerWidth-bw-4),y=r.bottom+2;if(y+bh&gt;innerHeight-4)y=Math.max(4,r.top-bh-2);
+  box.style.left=x+&quot;px&quot;;box.style.top=y+&quot;px&quot;;openT=Date.now()});
+ document.addEventListener(&quot;mousedown&quot;,e=&gt;{if(box&amp;&amp;!box.contains(e.target))close()},true);
+ document.addEventListener(&quot;keydown&quot;,e=&gt;{if(e.key===&quot;Escape&quot;)close()},true);
+ document.addEventListener(&quot;scroll&quot;,e=&gt;{if(box&amp;&amp;e.target!==box&amp;&amp;Date.now()-openT&gt;500)close()},true);
+ window.addEventListener(&quot;resize&quot;,close)})();
 $(&quot;menu&quot;).onclick=()=&gt;{parent.postMessage({t:&quot;sched-menu&quot;},&quot;*&quot;)};
 const now=new Date();const dm=new Date(now.getFullYear(),now.getMonth()+(now.getDate()&gt;20?1:0),1);$(&quot;m&quot;).value=dm.getFullYear()+&quot;-&quot;+pad(dm.getMonth()+1);
 const HM={ARIF:235,AHSAN:155,MARUF:50,SAYED:190,TAMIM:330,AMIT:275,BASUDEB:85},XH=[15,305,215,120,355,70,170,255];
@@ -834,8 +882,26 @@ function fit(){
   if(G[c.gi].d.length===1){cv.font=&#x27;600 11px &quot;Exo 2&quot;,&quot;Segoe UI&quot;,sans-serif&#x27;;w=Math.max(w,Math.ceil(cv.measureText(c.g).width)+14)}
   cols[CO.indexOf(ci)+1].style.width=w+&quot;px&quot;;tot+=w});
  $(&quot;t&quot;).style.width=tot+&quot;px&quot;}
-const cls=(c,v)=&gt;{if(!v)return&quot;&quot;;if(c.s===&quot;E&quot;&amp;&amp;(c.gi===5||c.gi===6||c.gi===11))return&quot;o&quot;;return c.t===&quot;t&quot;||c.t===&quot;n&quot;?&quot;tt&quot;:c.t===&quot;z&quot;?&quot;&quot;:&quot;f&quot;};
-const cell0=(c,ci,v,iso)=&gt;`&lt;td class=&quot;${cls(c,v)}&quot; style=&quot;--h:${hue(v||&quot;x&quot;)}${c.first&amp;&amp;ci&gt;0?&quot;;border-left:2px solid #4b6358&quot;:&quot;&quot;}&quot;&gt;&lt;input data-k=&quot;${iso}&quot; data-c=&quot;${ci}&quot; list=&quot;${c.s===&quot;T&quot;?&quot;dl-t&quot;:&quot;dl-e&quot;}&quot; value=&quot;${v.replace(/&quot;/g,&quot;&amp;quot;&quot;)}&quot;&gt;&lt;/td&gt;`;
+/* Rest-day rule: 2+ consecutive Physical/Logical Night -&gt; day after the last night, that name cannot be placed in any cell */
+const pad5=r=&gt;{r=r.slice();while(r.length&lt;5)r.push(&quot;&quot;);return r};
+const isNightC=ci=&gt;C[ci].s===&quot;E&quot;&amp;&amp;(C[ci].gi===5||C[ci].gi===11);
+const shiftD=(iso,k)=&gt;{const p=iso.split(&quot;-&quot;).map(Number),d=new Date(p[0],p[1]-1,p[2]+k);return d.getFullYear()+&quot;-&quot;+pad(d.getMonth()+1)+&quot;-&quot;+pad(d.getDate())};
+const rowVals=(iso,h)=&gt;{const a=(S.days[iso]||[]).slice();while(a.length&lt;C.length)a.push(&quot;&quot;);
+ if(h&amp;&amp;h.iso===iso){a[h.ci]=h.v;const c=C[h.ci];
+  if(c.s===&quot;E&quot;&amp;&amp;(c.gi===5||c.gi===6))C.forEach((cc,i)=&gt;{if(i!==h.ci&amp;&amp;cc.t!==&quot;z&quot;&amp;&amp;cc.gi!==11&amp;&amp;String(a[i]||&quot;&quot;).trim().toUpperCase()===h.v)a[i]=&quot;&quot;})}
+ return a};
+const nameSt=(iso,nm,h)=&gt;{let n=false,o=false;rowVals(iso,h).forEach((v,i)=&gt;{if(C[i].t===&quot;z&quot;||String(v||&quot;&quot;).trim().toUpperCase()!==nm)return;if(isNightC(i))n=true;else o=true});return{n,o}};
+const nightRun=(iso,nm,h)=&gt;{let L=0,d=shiftD(iso,-1);while(L&lt;60&amp;&amp;nameSt(d,nm,h).n){L++;d=shiftD(d,-1)}return L};
+const dLbl=iso=&gt;{const p=iso.split(&quot;-&quot;).map(Number);return new Date(p[0],p[1]-1,p[2]).toLocaleDateString(&quot;en-US&quot;,{weekday:&quot;short&quot;,month:&quot;short&quot;,day:&quot;numeric&quot;,year:&quot;numeric&quot;})};
+function restViolation(iso,ci,v){const nm=String(v).trim().toUpperCase(),h={iso,ci,v:nm};
+ for(let k=0;k&lt;=5;k++){const x=shiftD(iso,k),s=nameSt(x,nm,h),L=nightRun(x,nm,h);
+  if((L&gt;=2&amp;&amp;s.o)||(L&gt;=3&amp;&amp;s.n)){
+   let msg=nm+&quot; — porpor &quot;+L+&quot; ta Night (Physical/Logical) duty er por, porer din (&quot;+dLbl(x)+&quot;) oi naam kono cell e boshano jabe na (rest day).&quot;;
+   if(x!==iso)msg+=&quot;\n(&quot;+dLbl(x)+&quot; te ei naam already ache — age oita soriye tarpor Night boshan.)&quot;;
+   alert(msg);return true}}
+ return false}
+const cls=(c,v)=&gt;{if(!v)return&quot;&quot;;if((c.s===&quot;E&quot;&amp;&amp;c.gi===6)||(c.s===&quot;T&quot;&amp;&amp;c.gi===10))return&quot;comp&quot;;if(c.s===&quot;E&quot;&amp;&amp;(c.gi===5||c.gi===11))return&quot;o&quot;;return c.t===&quot;t&quot;||c.t===&quot;n&quot;?&quot;tt&quot;:c.t===&quot;z&quot;?&quot;&quot;:&quot;f&quot;};
+const cell0=(c,ci,v,iso)=&gt;`&lt;td class=&quot;${cls(c,v)}&quot; style=&quot;--h:${hue(v||&quot;x&quot;)}${c.first&amp;&amp;ci&gt;0?&quot;;border-left:2px solid #4b6358&quot;:&quot;&quot;}&quot;&gt;&lt;input readonly data-k=&quot;${iso}&quot; data-c=&quot;${ci}&quot; value=&quot;${v.replace(/&quot;/g,&quot;&amp;quot;&quot;)}&quot;&gt;&lt;/td&gt;`;
 const ZONES=[&quot;Bashundhara&quot;,&quot;Dhanmondi&quot;,&quot;Uttara&quot;,&quot;Motijheel&quot;,&quot;Banani&quot;,&quot;Mirpur DOHS&quot;,&quot;Banasree&quot;,&quot;Utta/Mir/Banasree&quot;];
 const cell=(c,ci,v,iso)=&gt;{
  if(c.t!==&quot;z&quot;)return cell0(c,ci,v,iso);
@@ -850,7 +916,7 @@ function render(){
  days().forEach(d=&gt;{const a=S.days[d.iso]||[];
   h+=`&lt;tr class=&quot;${hol(d.iso)?&quot;we gh&quot;:d.w&gt;=5?&quot;we&quot;:&quot;&quot;}&quot;&gt;&lt;td class=&quot;d&quot;${hol(d.iso)?` title=&quot;${hol(d.iso).replace(/&quot;/g,&quot;&quot;)}&quot;`:&quot;&quot;}&gt;${d.lbl}&lt;/td&gt;`+CO.map(ci=&gt;cell(C[ci],ci,a[ci]||&quot;&quot;,d.iso)).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;});
  $(&quot;t&quot;).innerHTML=&quot;&lt;colgroup&gt;&lt;col&gt;&quot;+C.map(()=&gt;&quot;&lt;col&gt;&quot;).join(&quot;&quot;)+&quot;&lt;/colgroup&gt;&quot;+h+&quot;&lt;/tbody&gt;&quot;;fit();
- $(&quot;tt&quot;).innerHTML=&quot;&lt;tr&gt;&lt;th&gt;Team&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Helper&lt;/th&gt;&lt;/tr&gt;&quot;+S.teams.tt.map((r,i)=&gt;&quot;&lt;tr&gt;&quot;+r.map((v,j)=&gt;`&lt;td&gt;&lt;input data-tm=&quot;tt&quot; data-r=&quot;${i}&quot; data-j=&quot;${j}&quot; size=&quot;${Math.max(8,v.length+3)}&quot; value=&quot;${v}&quot;&gt;&lt;/td&gt;`).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;).join(&quot;&quot;);
+ $(&quot;tt&quot;).innerHTML=&quot;&lt;tr&gt;&lt;th&gt;Team&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Helper&lt;/th&gt;&lt;th&gt;Helper&lt;/th&gt;&lt;/tr&gt;&quot;+S.teams.tt.map((r,i)=&gt;&quot;&lt;tr&gt;&quot;+pad5(r).map((v,j)=&gt;`&lt;td&gt;&lt;input data-tm=&quot;tt&quot; data-r=&quot;${i}&quot; data-j=&quot;${j}&quot; size=&quot;${Math.max(8,v.length+3)}&quot; value=&quot;${v}&quot;&gt;&lt;/td&gt;`).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;).join(&quot;&quot;);
  $(&quot;nt&quot;).innerHTML=&quot;&lt;tr&gt;&lt;th&gt;Team&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;th&gt;Technician&lt;/th&gt;&lt;/tr&gt;&quot;+S.teams.nt.map((r,i)=&gt;&quot;&lt;tr&gt;&quot;+r.map((v,j)=&gt;`&lt;td&gt;&lt;input data-tm=&quot;nt&quot; data-r=&quot;${i}&quot; data-j=&quot;${j}&quot; size=&quot;${Math.max(8,v.length+3)}&quot; value=&quot;${v}&quot;&gt;&lt;/td&gt;`).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;).join(&quot;&quot;);
 }
 const upd=t=&gt;{if(t.dataset.k){const a=(S.days[t.dataset.k]||C.map(()=&gt;&quot;&quot;)).slice();a[+t.dataset.c]=t.value.trim();S.days[t.dataset.k]=a}
@@ -878,8 +944,8 @@ $(&quot;rn&quot;).onclick=()=&gt;{const n=(prompt(&quot;Name to remove from the 
 $(&quot;clr&quot;).onclick=()=&gt;{if(!confirm(&quot;Clear all entries of this month?&quot;))return;days().forEach(d=&gt;{delete S.days[d.iso];if(S.mv)delete S.mv[d.iso]});save();render()};
 const rowsD=()=&gt;[[&quot;Date&quot;].concat(CO.map(ci=&gt;C[ci].first?C[ci].g:&quot;&quot;))].concat(days().map(d=&gt;[d.lbl].concat(CO.map(ci=&gt;(S.days[d.iso]||[])[ci]||&quot;&quot;))));
 const rowsT=()=&gt;{const R=rowsD();
- R.push([&quot;&quot;],[&quot;Technician Teams&quot;],[&quot;Team&quot;,&quot;Technician&quot;,&quot;Technician&quot;,&quot;Helper&quot;]);
- S.teams.tt.forEach(r=&gt;R.push(r.slice()));
+ R.push([&quot;&quot;],[&quot;Technician Teams&quot;],[&quot;Team&quot;,&quot;Technician&quot;,&quot;Technician&quot;,&quot;Helper&quot;,&quot;Helper&quot;]);
+ S.teams.tt.forEach(r=&gt;R.push(pad5(r)));
  R.push([&quot;&quot;],[&quot;Night Teams&quot;],[&quot;Team&quot;,&quot;Technician&quot;,&quot;Technician&quot;,&quot;Technician&quot;]);
  S.teams.nt.forEach(r=&gt;R.push(r.slice()));
  const N=[];const walk=n=&gt;{n.childNodes.forEach(c=&gt;{if(c.nodeType===3){const t=c.textContent.trim();if(t)N.push([t])}
@@ -889,32 +955,76 @@ const rowsT=()=&gt;{const R=rowsD();
   else{(c.innerText||c.textContent||&quot;&quot;).split(&quot;\n&quot;).forEach(l=&gt;{if(l.trim())N.push([l.trim()])})}})};
  walk(noteEl);
  if(N.length){R.push([&quot;&quot;],[&quot;Notes&quot;]);N.forEach(r=&gt;R.push(r))}
+ if((S.xt||[]).length){R.push([&quot;&quot;],[&quot;Extra Tables&quot;]);S.xt.forEach((x,k)=&gt;{if(k)R.push([&quot;&quot;]);R.push([&quot;Table &quot;+(k+1)]);x.rows.forEach(r=&gt;R.push(r.slice()))})}
  const w=Math.max(...R.map(r=&gt;r.length));
  return R.map(r=&gt;{r=r.slice();while(r.length&lt;w)r.push(&quot;&quot;);return r})};
-$(&quot;cp&quot;).onclick=()=&gt;{const tx=rowsT().map(r=&gt;r.join(&quot;\t&quot;)).join(&quot;\n&quot;);
- const ok=()=&gt;{$(&quot;ok&quot;).textContent=&quot;Copied ✓&quot;;setTimeout(()=&gt;$(&quot;ok&quot;).textContent=&quot;&quot;,2000)};
- const fb=()=&gt;{const a=document.createElement(&quot;textarea&quot;);a.value=tx;document.body.appendChild(a);a.select();try{document.execCommand(&quot;copy&quot;);ok()}catch(e){}a.remove()};
- navigator.clipboard&amp;&amp;window.isSecureContext?navigator.clipboard.writeText(tx).then(ok,fb):fb()};
+/* Screenshot: Date column -&gt; Engineer Compensatory column, whole month, saved as PNG */
+$(&quot;shot&quot;).onclick=async()=&gt;{
+ const tbl=$(&quot;t&quot;),sc=tbl.parentElement,cc=C.findIndex(c=&gt;c.s===&quot;E&quot;&amp;&amp;c.gi===6);
+ const inp=tbl.querySelector(&#x27;input[data-c=&quot;&#x27;+cc+&#x27;&quot;]&#x27;);
+ if(!inp){alert(&quot;Schedule table pawa jayni.&quot;);return}
+ try{await document.fonts.ready}catch(e){}
+ const sl=sc.scrollLeft,st=sc.scrollTop;sc.scrollLeft=0;sc.scrollTop=0;
+ const tr=tbl.getBoundingClientRect(),edge=inp.parentElement.getBoundingClientRect().right-tr.left,items=[];
+ tbl.querySelectorAll(&quot;th,td&quot;).forEach(el=&gt;{
+  const r=el.getBoundingClientRect(),x=r.left-tr.left,y=r.top-tr.top;
+  if(x+r.width&gt;edge+0.5)return;
+  const cs=getComputedStyle(el),f=el.querySelector(&quot;input,select&quot;);let txt,tcs=cs;
+  if(f){txt=f.tagName===&quot;SELECT&quot;?((f.options[f.selectedIndex]||{}).text||&quot;&quot;):f.value;tcs=getComputedStyle(f)}else txt=el.textContent.trim();
+  const sd=n=&gt;({w:cs.getPropertyValue(&quot;border-&quot;+n+&quot;-style&quot;)===&quot;none&quot;?0:(parseFloat(cs.getPropertyValue(&quot;border-&quot;+n+&quot;-width&quot;))||0),c:cs.getPropertyValue(&quot;border-&quot;+n+&quot;-color&quot;)});
+  const bg=cs.backgroundColor,ol=cs.outlineStyle!==&quot;none&quot;?parseFloat(cs.outlineWidth)||0:0;
+  items.push({x,y,w:r.width,h:r.height,bg:(!bg||bg===&quot;transparent&quot;||bg===&quot;rgba(0, 0, 0, 0)&quot;)?&quot;#ffffff&quot;:bg,
+   txt,color:tcs.color,font:tcs.fontWeight+&quot; &quot;+tcs.fontSize+&quot; &quot;+tcs.fontFamily,
+   so:/rgb\(0, 0, 0\) -1px/.test(tcs.textShadow),left:/^(left|start)$/.test(tcs.textAlign),pl:parseFloat(cs.paddingLeft)||0,
+   b:[sd(&quot;top&quot;),sd(&quot;right&quot;),sd(&quot;bottom&quot;),sd(&quot;left&quot;)],ol,olc:cs.outlineColor})});
+ const H=32,S2=2,W=Math.ceil(edge),HT=Math.ceil(tr.height)+H;
+ sc.scrollLeft=sl;sc.scrollTop=st;
+ const cv=document.createElement(&quot;canvas&quot;);cv.width=W*S2;cv.height=HT*S2;
+ const g=cv.getContext(&quot;2d&quot;);g.scale(S2,S2);g.fillStyle=&quot;#ffffff&quot;;g.fillRect(0,0,W,HT);
+ const [yy,mm]=$(&quot;m&quot;).value.split(&quot;-&quot;).map(Number);
+ g.fillStyle=&quot;#14463a&quot;;g.font=&#x27;700 16px &quot;Exo 2&quot;,&quot;Segoe UI&quot;,sans-serif&#x27;;g.textBaseline=&quot;middle&quot;;g.textAlign=&quot;left&quot;;
+ g.fillText(&quot;Duty Schedule — &quot;+new Date(yy,mm-1,1).toLocaleDateString(&quot;en-US&quot;,{month:&quot;long&quot;,year:&quot;numeric&quot;}),6,H/2);
+ items.forEach(it=&gt;{const x=it.x,y=it.y+H;
+  g.fillStyle=it.bg;g.fillRect(x,y,it.w,it.h);
+  if(it.txt){g.save();g.beginPath();g.rect(x,y,it.w,it.h);g.clip();g.fillStyle=it.color;g.font=it.font;g.textBaseline=&quot;middle&quot;;
+   const tx=it.left?x+it.pl:x+it.w/2;g.textAlign=it.left?&quot;left&quot;:&quot;center&quot;;
+   if(it.so){g.lineJoin=&quot;round&quot;;g.lineWidth=2.6;g.strokeStyle=&quot;#000&quot;;g.strokeText(it.txt,tx,y+it.h/2+.5)}
+   g.fillText(it.txt,tx,y+it.h/2+.5)
+   g.restore()}});
+ items.forEach(it=&gt;{const x=it.x,y=it.y+H,[t,r,b,l]=it.b;
+  if(t.w){g.fillStyle=t.c;g.fillRect(x,y,it.w,t.w)}
+  if(b.w){g.fillStyle=b.c;g.fillRect(x,y+it.h-b.w,it.w,b.w)}
+  if(l.w){g.fillStyle=l.c;g.fillRect(x,y,l.w,it.h)}
+  if(r.w){g.fillStyle=r.c;g.fillRect(x+it.w-r.w,y,r.w,it.h)}
+  if(it.ol){g.strokeStyle=it.olc;g.lineWidth=it.ol;g.strokeRect(x+it.ol/2,y+it.ol/2,it.w-it.ol,it.h-it.ol)}});
+ cv.toBlob(b=&gt;{if(!b){alert(&quot;Screenshot banano gelo na.&quot;);return}
+  const a=document.createElement(&quot;a&quot;);a.href=URL.createObjectURL(b);a.download=&quot;duty-schedule-&quot;+$(&quot;m&quot;).value+&quot;.png&quot;;
+  document.body.appendChild(a);a.click();a.remove();
+  $(&quot;ok&quot;).textContent=&quot;Screenshot saved ✓&quot;;setTimeout(()=&gt;$(&quot;ok&quot;).textContent=&quot;&quot;,2500)},&quot;image/png&quot;)};
 $(&quot;xl&quot;).onclick=async()=&gt;{
  if(!window.ExcelJS){alert(&quot;Excel library load hoyni. Internet connection check korun.&quot;);return}
  const R=rowsT(),NC=1+CO.length,wb=new ExcelJS.Workbook(),ws=wb.addWorksheet(&quot;Duty Schedule&quot;);
  const bd={style:&quot;thin&quot;,color:{argb:&quot;FF000000&quot;}},B={top:bd,left:bd,bottom:bd,right:bd};
- const iT=R.findIndex(r=&gt;r[0]===&quot;Technician Teams&quot;),iN=R.findIndex(r=&gt;r[0]===&quot;Night Teams&quot;),iO=R.findIndex(r=&gt;r[0]===&quot;Notes&quot;);
+ const iT=R.findIndex(r=&gt;r[0]===&quot;Technician Teams&quot;),iN=R.findIndex(r=&gt;r[0]===&quot;Night Teams&quot;),iO=R.findIndex(r=&gt;r[0]===&quot;Notes&quot;),iX=R.findIndex(r=&gt;r[0]===&quot;Extra Tables&quot;);
  R.forEach(r=&gt;ws.addRow(r));
  const box=(i,c1,c2)=&gt;{for(let j=c1;j&lt;=c2;j++){const c=ws.getCell(i+1,j+1);c.border=B;c.alignment={vertical:&quot;middle&quot;,horizontal:&quot;center&quot;}}};
  for(let i=0;i&lt;=iT-2;i++)box(i,0,NC-1);
  ws.getRow(1).font={bold:true};
  let s0=1;for(let j=2;j&lt;=NC;j++){if(j===NC||String(R[0][j]).trim()!==&quot;&quot;){if(j-1&gt;s0)ws.mergeCells(1,s0+1,1,j);s0=j}}
- const endN=iO&gt;=0?iO-2:R.length-1;
- for(let i=iT+1;i&lt;=iN-2;i++)box(i,0,3);
+ const endN=iO&gt;=0?iO-2:(iX&gt;=0?iX-2:R.length-1);
+ for(let i=iT+1;i&lt;=iN-2;i++)box(i,0,4);
  for(let i=iN+1;i&lt;=endN;i++)box(i,0,3);
  [iT,iT+1,iN,iN+1,iO].forEach(i=&gt;{if(i&gt;=0)ws.getRow(i+1).font={bold:true,size:i===iT||i===iN||i===iO?12:11}});
- if(iO&gt;=0)for(let i=iO+1;i&lt;R.length;i++){const r=R[i];let last=-1,cnt=0;r.forEach((v,j)=&gt;{if(String(v).trim()!==&quot;&quot;){last=j;cnt++}});
+ if(iO&gt;=0)for(let i=iO+1;i&lt;(iX&gt;=0?iX-1:R.length);i++){const r=R[i];let last=-1,cnt=0;r.forEach((v,j)=&gt;{if(String(v).trim()!==&quot;&quot;){last=j;cnt++}});
   if(last&lt;0)continue;
   if(cnt===1&amp;&amp;last===0){ws.mergeCells(i+1,1,i+1,6);const c=ws.getCell(i+1,1);c.alignment={vertical:&quot;top&quot;,horizontal:&quot;left&quot;,wrapText:true};for(let j=1;j&lt;=6;j++)ws.getCell(i+1,j).border=B;ws.getRow(i+1).height=Math.max(15,15*Math.ceil(String(r[0]).length/70))}
   else box(i,0,last)}
+ if(iX&gt;=0){ws.getRow(iX+1).font={bold:true,size:12};let n=0,left=0,wd=0;for(let i=iX+1;i&lt;R.length;i++){
+  if(left&gt;0){box(i,0,wd-1);left--;continue}
+  if(/^Table \d+$/.test(String(R[i][0]))&amp;&amp;S.xt[n]){ws.getRow(i+1).font={bold:true};wd=S.xt[n].rows[0].length;left=S.xt[n].rows.length;n++}}}
  for(let j=0;j&lt;NC;j++){let m=8;for(let i=1;i&lt;=iT-2;i++)m=Math.max(m,String(R[i][j]||&quot;&quot;).length+2);
-  if(j&lt;4)for(let i=iT+1;i&lt;=endN;i++)m=Math.max(m,String(R[i][j]||&quot;&quot;).length+2);
+  if(j&lt;5)for(let i=iT+1;i&lt;=endN;i++)m=Math.max(m,String(R[i][j]||&quot;&quot;).length+2);
+  if(iX&gt;=0)for(let i=iX+1;i&lt;R.length;i++)m=Math.max(m,String(R[i][j]||&quot;&quot;).length+2);
   ws.getColumn(j+1).width=Math.min(m,28)}
  const buf=await wb.xlsx.writeBuffer();
  const b=new Blob([buf],{type:&quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;});
@@ -926,7 +1036,7 @@ window.addEventListener(&quot;message&quot;,e=&gt;{
  let n=0,added=false;
  Object.keys(d.a).forEach(iso=&gt;{
   const names=d.a[iso].map(x=&gt;String(x||&quot;&quot;).trim().toUpperCase()).map(x=&gt;al[x]||x);
-  if(!names.some(Boolean))return;
+  if(!names.some(Boolean)&amp;&amp;!d.one)return;
   const row=(S.days[iso]||[]).slice();while(row.length&lt;C.length)row.push(&quot;&quot;);
   C.forEach((c,ci)=&gt;{if(isE(c))row[ci]=&quot;&quot;});
   names.forEach((nm,pos)=&gt;{
@@ -996,8 +1106,8 @@ noteEl.addEventListener(&quot;keydown&quot;,e=&gt;{
 $(&quot;ntbl&quot;).onclick=()=&gt;{
  const r=parseInt(prompt(&quot;Koyta row?&quot;,&quot;3&quot;)||&quot;&quot;,10),c=parseInt(prompt(&quot;Koyta column?&quot;,&quot;3&quot;)||&quot;&quot;,10);
  if(!(r&gt;0&amp;&amp;c&gt;0))return;
- const tb=&quot;&lt;table&gt;&quot;+(&quot;&lt;tr&gt;&quot;+&quot;&lt;td&gt;&lt;br&gt;&lt;/td&gt;&quot;.repeat(Math.min(c,20))+&quot;&lt;/tr&gt;&quot;).repeat(Math.min(r,50))+&quot;&lt;/table&gt;&lt;br&gt;&quot;;
- noteEl.focus();document.execCommand(&quot;insertHTML&quot;,false,tb);saveNote()};
+ const R=Math.min(r,50),Cc=Math.min(c,20);(S.xt=S.xt||[]).push({rows:Array.from({length:R},()=&gt;Array(Cc).fill(&quot;&quot;))});save();renderXT();
+ const lastI=xtsEl.querySelector(&quot;.xtb:last-child input&quot;);if(lastI){lastI.focus();lastI.scrollIntoView({block:&quot;nearest&quot;})}};
 const withCell=f=&gt;{const c=curCell();if(!c)return;f(c,c.closest(&quot;table&quot;),c.parentElement);saveNote()};
 $(&quot;nar&quot;).onclick=()=&gt;withCell((c,t,r)=&gt;{const n=r.cloneNode(true);n.querySelectorAll(&quot;td&quot;).forEach(x=&gt;x.innerHTML=&quot;&lt;br&gt;&quot;);r.after(n)});
 $(&quot;nac&quot;).onclick=()=&gt;withCell((c,t,r)=&gt;{const i=[...r.children].indexOf(c);t.querySelectorAll(&quot;tr&quot;).forEach(tr=&gt;{const td=document.createElement(&quot;td&quot;);td.innerHTML=&quot;&lt;br&gt;&quot;;tr.children[i].after(td)})});
@@ -1006,20 +1116,39 @@ $(&quot;ndc&quot;).onclick=()=&gt;withCell((c,t,r)=&gt;{const i=[...r.children].
 $(&quot;ndt&quot;).onclick=()=&gt;withCell((c,t)=&gt;t.remove());
 // keep toolbar buttons from stealing the text cursor
 nb.querySelector(&quot;.nbt&quot;).addEventListener(&quot;mousedown&quot;,e=&gt;{if(e.target.tagName===&quot;BUTTON&quot;)e.preventDefault()});
-const smap=()=&gt;{const m={};Object.keys(S.days).forEach(k=&gt;{m[&quot;days/&quot;+k]=JSON.stringify(S.days[k])});Object.keys(S.mv||{}).forEach(k=&gt;{m[&quot;mv/&quot;+k]=JSON.stringify(S.mv[k])});m.teams=JSON.stringify(S.teams);m.list=JSON.stringify(S.list);m.notes=S.notes||&quot;&quot;;return m};
-let needR=false;document.addEventListener(&quot;focusout&quot;,()=&gt;{if(needR){needR=false;setTimeout(render,80)}});
+/* ===== Extra tables (created with &quot;Insert Table&quot;), shown below the Notes box ===== */
+const xtsEl=$(&quot;xts&quot;),hx=s=&gt;String(s).replace(/&amp;/g,&quot;&amp;amp;&quot;).replace(/&quot;/g,&quot;&amp;quot;&quot;).replace(/&lt;/g,&quot;&amp;lt;&quot;);
+function renderXT(){
+ xtsEl.innerHTML=(S.xt||[]).map((x,k)=&gt;`&lt;div class=&quot;xtb&quot;&gt;&lt;div class=&quot;xtbar&quot;&gt;&lt;b&gt;Table ${k+1}&lt;/b&gt;`+
+  [[&quot;ar&quot;,&quot;+ Row&quot;],[&quot;ac&quot;,&quot;+ Col&quot;],[&quot;dr&quot;,&quot;− Row&quot;],[&quot;dc&quot;,&quot;− Col&quot;],[&quot;dt&quot;,&quot;Delete Table&quot;]].map(a=&gt;`&lt;button type=&quot;button&quot; data-xa=&quot;${a[0]}&quot; data-xk=&quot;${k}&quot;${a[0]===&quot;dt&quot;?&#x27; class=&quot;del&quot;&#x27;:&quot;&quot;}&gt;${a[1]}&lt;/button&gt;`).join(&quot;&quot;)+
+  `&lt;/div&gt;&lt;div class=&quot;tb&quot;&gt;&lt;table class=&quot;xt&quot;&gt;`+x.rows.map((r,i)=&gt;&quot;&lt;tr&gt;&quot;+r.map((v,j)=&gt;`&lt;td&gt;&lt;input data-xt=&quot;${k}&quot; data-r=&quot;${i}&quot; data-j=&quot;${j}&quot; size=&quot;${Math.max(8,String(v).length+3)}&quot; value=&quot;${hx(v)}&quot;&gt;&lt;/td&gt;`).join(&quot;&quot;)+&quot;&lt;/tr&gt;&quot;).join(&quot;&quot;)+`&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;`).join(&quot;&quot;)}
+xtsEl.addEventListener(&quot;input&quot;,e=&gt;{const t=e.target;if(t.dataset.xt===undefined)return;const x=(S.xt||[])[+t.dataset.xt];if(!x)return;
+ x.rows[+t.dataset.r][+t.dataset.j]=t.value;t.size=Math.max(8,t.value.length+3)});
+xtsEl.addEventListener(&quot;click&quot;,e=&gt;{const b=e.target.closest(&quot;button[data-xa]&quot;);if(!b)return;
+ const k=+b.dataset.xk,x=(S.xt||[])[k],a=b.dataset.xa;if(!x)return;
+ const ask=&quot;Data muche jabe. Thik ache?&quot;;
+ if(a===&quot;ar&quot;)x.rows.push(x.rows[0].map(()=&gt;&quot;&quot;));
+ else if(a===&quot;ac&quot;){if(x.rows[0].length&lt;20)x.rows.forEach(r=&gt;r.push(&quot;&quot;))}
+ else if(a===&quot;dr&quot;){if(x.rows.length&gt;1&amp;&amp;(!x.rows[x.rows.length-1].some(v=&gt;v)||confirm(ask)))x.rows.pop()}
+ else if(a===&quot;dc&quot;){if(x.rows[0].length&gt;1&amp;&amp;(!x.rows.some(r=&gt;r[r.length-1])||confirm(ask)))x.rows.forEach(r=&gt;r.pop())}
+ else if(a===&quot;dt&quot;){if(confirm(&quot;Table &quot;+(k+1)+&quot; delete korben?&quot;))S.xt.splice(k,1);else return}
+ save();renderXT()});
+const smap=()=&gt;{const m={};Object.keys(S.days).forEach(k=&gt;{m[&quot;days/&quot;+k]=JSON.stringify(S.days[k])});Object.keys(S.mv||{}).forEach(k=&gt;{m[&quot;mv/&quot;+k]=JSON.stringify(S.mv[k])});m.teams=JSON.stringify(S.teams);m.list=JSON.stringify(S.list);m.notes=S.notes||&quot;&quot;;m.xt=JSON.stringify(S.xt||[]);return m};
+let needR=false,needX=false;document.addEventListener(&quot;focusout&quot;,()=&gt;{if(needR){needR=false;setTimeout(render,80)}if(needX){needX=false;setTimeout(renderXT,80)}});
 const sapply=m=&gt;{const days={};
  Object.keys(m).forEach(k=&gt;{if(k.indexOf(&quot;days/&quot;)===0){try{days[k.slice(5)]=JSON.parse(m[k])}catch(e){}}});
  S.days=days;
  {const mv={};Object.keys(m).forEach(k=&gt;{if(k.indexOf(&quot;mv/&quot;)===0){try{mv[k.slice(3)]=JSON.parse(m[k])}catch(e){}}});S.mv=mv}
- try{if(m.teams)S.teams=JSON.parse(m.teams)}catch(e){}try{while(S.teams.tt.length&lt;9)S.teams.tt.push([&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;])}catch(e){}
+ try{if(m.teams)S.teams=JSON.parse(m.teams)}catch(e){}try{while(S.teams.tt.length&lt;9)S.teams.tt.push([&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;])}catch(e){}
  try{if(m.list){S.list=JSON.parse(m.list);setDL()}}catch(e){}
  if(typeof m.notes===&quot;string&quot;){S.notes=m.notes;if(document.activeElement!==noteEl&amp;&amp;noteEl.innerHTML!==m.notes)noteEl.innerHTML=m.notes}
+ if(typeof m.xt===&quot;string&quot;){try{S.xt=JSON.parse(m.xt)}catch(e){}}
  try{localStorage.setItem(&quot;sched-v1&quot;,JSON.stringify(S))}catch(e){}
  const a=document.activeElement;
+ if(a&amp;&amp;a.closest&amp;&amp;a.closest(&quot;#xts&quot;))needX=true;else renderXT();
  if(a&amp;&amp;a.closest&amp;&amp;a.closest(&quot;#t&quot;)&amp;&amp;/INPUT|SELECT/.test(a.tagName))needR=true;else render()};
 CS=cloudSync(&quot;schedule&quot;,smap,sapply);
-render();
+render();renderXT();
 try{document.fonts.load(&#x27;800 11px &quot;Exo 2&quot;&#x27;).then(fit);document.fonts.ready.then(fit)}catch(e){}
 if(document.fonts){document.fonts.load(&#x27;700 12px &quot;Exo 2&quot;&#x27;).then(fit)}
 &lt;/script&gt;&lt;/body&gt;&lt;/html&gt;
